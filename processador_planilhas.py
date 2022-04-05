@@ -3,6 +3,7 @@ import pandas as pd
 from pathlib import Path
 import glob
 import fitz
+import numpy as np
 
 
 #################################                  unificador planilhas               ################################
@@ -22,9 +23,12 @@ def main():
 	#	print("Lida!")
 
 	todos_dados = todos_dados.append(dados_planilhas_lidas, ignore_index=True, sort=False)
+	todos_dados["Tribunal"] = np.where(todos_dados['Tribunal'].isnull() == True, "TJ"+todos_dados["Estado"].str[:],todos_dados['Tribunal'])
+
+	todos_dados["Checagem"] = "LAI"
+
 	todos_dados.to_excel("Dados_compilados.xlsx", index=False)
-
-
+	print(todos_dados)
 
 # main()
 # z= input("")
@@ -965,7 +969,9 @@ def dados_TRF3():
 	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 
-	dados = dados[["Número do Processo", "Comarca", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência"]]
+	dados["Tribunal"] = "TRF3"
+
+	dados = dados[["Número do Processo", "Comarca", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado", "Tribunal","Competência"]]
 	# print(dados)
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -1015,7 +1021,8 @@ def dados_TRF4():
 	dados = pd.concat([dfs[0],dfs[1],dfs[2]])
 	# print(dados)
 
-	dados["Competência"] = "Federal - TRF4"
+	dados["Competência"] = "Federal"
+
 
 	df_filter = dados ["Ano"] >= 2017
 	dados = dados[df_filter]
@@ -1030,8 +1037,9 @@ def dados_TRF4():
 
 	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
+	dados["Tribunal"] = "TRF4"
 
-	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência"]]
+	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Tribunal","Competência"]]
 	# print(dados)
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
