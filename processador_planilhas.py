@@ -25,13 +25,16 @@ def main():
 	todos_dados = todos_dados.append(dados_planilhas_lidas, ignore_index=True, sort=False)
 	todos_dados["Tribunal"] = np.where(todos_dados['Tribunal'].isnull() == True, "TJ"+todos_dados["Estado"].str[:],todos_dados['Tribunal'])
 
-	todos_dados["Checagem"] = "LAI"
+	todos_dados["Origem_dados"] = "LAI"
+
+	todos_dados["Comarca"] = todos_dados["Comarca"].str.lower() 
+	todos_dados["Vara"] = todos_dados["Vara"].str.lower()
 
 	todos_dados.to_excel("Dados_compilados_2.xlsx", index=False)
 	print(todos_dados)
 
-# main()
-# z= input("")
+main()
+z= input("")
 
 
 
@@ -56,8 +59,21 @@ def dados_AC():
 		usecols = ["Processo","Foro / Vara","Data Distribuição","Data da Movimentação"])
 	planilha_6 = pd.read_excel(".\Planilhas tribunais\TJAC_6.xlsx", engine ='openpyxl', 
 		usecols = ["Processo","Foro / Vara","Data Distribuição"])
-	planilha_7 = pd.read_excel(".\Planilhas tribunais\TJAC_7.xlsx", engine ='openpyxl', 
+	planilha_7_1 = pd.read_excel(".\Planilhas tribunais\TJAC_7.xlsx", engine ='openpyxl', sheet_name= 'Ext Punibilidade_morte do agent', 
 		usecols = ["Processo","Foro / Vara","Data Distribuição","Data da Movimentação"])
+	planilha_7_1['Planilha'] = "TJAC_7_1"
+	planilha_7_2 = pd.read_excel(".\Planilhas tribunais\TJAC_7.xlsx", engine ='openpyxl', sheet_name= 'Ext Punibilidade_morte do a (2)', 
+		usecols = ["Processo","Foro / Vara","Data Distribuição","Data da Movimentação"])
+	planilha_7_2['Planilha'] = "TJAC_7_2"
+	planilha_7_3 = pd.read_excel(".\Planilhas tribunais\TJAC_7.xlsx", engine ='openpyxl', sheet_name= 'Ext Punibilidade_morte do a (3)', 
+		usecols = ["Processo","Foro / Vara","Data Distribuição","Data da Movimentação"])
+	planilha_7_3['Planilha'] = "TJAC_7_3"
+	planilha_7_4 = pd.read_excel(".\Planilhas tribunais\TJAC_7.xlsx", engine ='openpyxl', sheet_name= 'Ext Punibiilidade_morte do agen', 
+		usecols = ["Processo","Foro / Vara","Data Distribuição","Data da Movimentação"])
+	planilha_7_4['Planilha'] = "TJAC_7_4"
+	planilha_7_5 = pd.read_excel(".\Planilhas tribunais\TJAC_7.xlsx", engine ='openpyxl', sheet_name= 'Ext Punibilidade_morte do a (4)', 
+		usecols = ["Processo","Foro / Vara","Data Distribuição","Data da Movimentação"])
+	planilha_7_5['Planilha'] = "TJAC_7_5"
 	planilha_8 = pd.read_excel(".\Planilhas tribunais\TJAC_8.xlsx", engine ='openpyxl', 
 		usecols = ["Processo","Foro / Vara","Data Distribuição","Data da Movimentação"])
 	planilha_9 = pd.read_excel(".\Planilhas tribunais\TJAC_9.xlsx", engine ='openpyxl', 
@@ -71,18 +87,18 @@ def dados_AC():
 	planilha_4['Planilha'] = "TJAC_4"
 	planilha_5['Planilha'] = "TJAC_5"
 	planilha_6['Planilha'] = "TJAC_6"
-	planilha_7['Planilha'] = "TJAC_7"
 	planilha_8['Planilha'] = "TJAC_8"
 	planilha_9['Planilha'] = "TJAC_9"
 	planilha_10['Planilha'] = "TJAC_10"
 
 
-	dados = pd.concat([planilha_1, planilha_2, planilha_3,planilha_4,planilha_5,planilha_6, planilha_7,planilha_8,planilha_9,planilha_10])
+	dados = pd.concat([planilha_1, planilha_2, planilha_3,planilha_4,planilha_5,planilha_6, planilha_7_1,planilha_7_2,planilha_7_3,planilha_7_4,planilha_7_5,
+		planilha_8,planilha_9,planilha_10])
 
-
-	dados["Foro / Vara"] = dados["Foro / Vara"].str.encode('UTF-8').str.decode("utf-8")
 	# print(dados)
 	# z = input("")
+
+	dados["Foro / Vara"] = dados["Foro / Vara"].str.encode('UTF-8').str.decode("utf-8")
 
 	corte = dados["Foro / Vara"].astype(str).str.split("/", n=1, expand = True)
 
@@ -96,7 +112,7 @@ def dados_AC():
 	try:
 		dados["Data da Movimentação"] = dados["Data da Movimentação"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
 	except:
-		dados["Data da Movimentação"] = ''
+		dados["Data da Movimentação"] = None
 	ano = dados["Processo"].astype(str).str.split(".", expand = True)[1]
 
 	dados["Ano"] = ano.astype(int)
@@ -142,14 +158,15 @@ def dados_AC():
 
 	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
-
+	print(dados)
+	# z= input('')
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_AC.xlsx", index = False, encoding='iso-8859-1')
 
-# dados_AC()
+dados_AC()
 
 
 #################################                  2- Al               ##################################################
@@ -240,7 +257,7 @@ def dados_AL():
 
 
 
-# dados_AL()
+dados_AL()
 
 
 
@@ -348,7 +365,7 @@ def dados_AM():
 
 	ano_2 = dados_2["Processo"].astype(str).str.split(".", expand = True)[1]
 
-	print(ano_2)
+	# print(ano_2)
 	dados_2["Ano"] = ano_2.astype(int)
 	dados_2["Estado"] = "AM"
 	dados_2["Competência"] = "Estadual"
@@ -364,7 +381,7 @@ def dados_AM():
 	df_filter_2 = dados_2 ["Ano"] >= 2017
 	dados_2 = dados_2[df_filter_2]
 	
-	dados_2["Planilha"] = "TJAM_2"
+	dados_2["Planilha"] = "TJAM_2_1"
 
 
 	## processamento da terceira planilha
@@ -408,7 +425,7 @@ def dados_AM():
 	df_filter_3 = dados_3["Ano"] >= 2017
 	dados_3 = dados_3[df_filter_3]
 
-	dados_3["Planilha"] = "TJAM_2_1"
+	dados_3["Planilha"] = "TJAM_2_2"
 
 
 	#### processamento da quarta planilha
@@ -477,7 +494,7 @@ def dados_AM():
 
 	dados_4['Data da Sentença'] = dados_4['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
-	dados_4["Planilha"] = "TJAM_2_2"
+	dados_4["Planilha"] = "TJAM_2_3"
 
 
 
@@ -505,13 +522,15 @@ def dados_AM():
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
+	print(dados)
+
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_AM.xlsx", index = False)
 
 
-# dados_AM()
+dados_AM()
 
 
 
@@ -641,7 +660,7 @@ def dados_AP():
  
 	planilha_3["Ano"] = ano_3.astype(int)
 
-	planilha_3["Planilha"] = "TJAP_3"
+	planilha_3["Planilha"] = "TJAP_3_1"
 
 
 
@@ -681,7 +700,7 @@ def dados_AP():
 
 	planilha_4["Ano"] = ano_4.astype(int)
 
-	planilha_4["Planilha"] = "TJAP_3_1"
+	planilha_4["Planilha"] = "TJAP_3_2"
 
 
 	############ parte 5 ######################
@@ -720,7 +739,7 @@ def dados_AP():
  
 	planilha_5["Ano"] = ano_5.astype(int)
 
-	planilha_5["Planilha"] = "TJAP_3_2"
+	planilha_5["Planilha"] = "TJAP_3_3"
 
 
 	################# unificação geral ###############
@@ -750,6 +769,9 @@ def dados_AP():
 	# print(dados)
 
 
+	print(dados)
+
+
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -759,7 +781,7 @@ def dados_AP():
 
 
 
-# dados_AP()
+dados_AP()
 
 ###################################  BA ###############################################
 
@@ -864,6 +886,10 @@ def dados_BA():
 
 	df_ba['Número do Processo'] = rest+"-"+cod+"."+ano_aj+"."+just+"."+est+"."+fim
 
+	ano_dados = ano_aj.astype(int)
+	df_ba["Ano"] = ano_dados
+	df_filter = df_ba["Ano"] >= 2017
+	df_ba = df_ba[df_filter]
 
 
 	df_ba['Data da Sentença'] = pd.to_datetime(df_ba['Data da Sentença'])
@@ -874,13 +900,13 @@ def dados_BA():
 	df_ba ["Origem"] = ""
 	df_ba ["Competência"] = "Estadual"
 	df_ba ["Planilha"] = 'TJBA_1'
-	df_ba ["Data da Distribuição"] = ''
+	df_ba ["Data da Distribuição"] = None
 
 
 	dados = df_ba
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
-	# print(dados)
+	print(dados)
 
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
@@ -891,7 +917,7 @@ def dados_BA():
 	dados.to_excel(".\planilhas filtradas\Dados_BA.xlsx", index = False)
 
 
-# dados_BA()
+dados_BA()
 
 ######################################################################################################################
 
@@ -921,11 +947,12 @@ def dados_TJCE():
 	dados_1["Número do Processo"] = dados_1["Número do Processo"].astype(str).str.replace(".","")
 	dados_1["Número do Processo"] = dados_1["Número do Processo"].astype(str).str.replace("-","")
 
-	dados_1["Comarca"] = ''
-	dados_1["Vara"] = ''
-	dados_1["Data da Distribuição"] =''
-	dados_1["Data da Sentença"] = ''
+	dados_1["Comarca"] = None
+	dados_1["Vara"] = None
+	dados_1["Data da Distribuição"] = None
+	dados_1["Data da Sentença"] = None
 	dados_1["Origem"] = 'SAJ'
+
 
 	# print(dados_1)
 
@@ -975,10 +1002,10 @@ def dados_TJCE():
 	dados_2["Número do Processo"] = dados_2["Número do Processo"].astype(str).str.replace(".","")
 	dados_2["Número do Processo"] = dados_2["Número do Processo"].astype(str).str.replace("-","")
 
-	dados_2["Comarca"] = ''
-	dados_2["Vara"] = ''
-	dados_2["Data da Distribuição"] =''
-	dados_2["Data da Sentença"] = ''
+	dados_2["Comarca"] = None
+	dados_2["Vara"] = None
+	dados_2["Data da Distribuição"] = None
+	dados_2["Data da Sentença"] = None
 	dados_2["Origem"] = 'SAJ'
 			
 
@@ -1028,13 +1055,13 @@ def dados_TJCE():
 	dados_3.drop(idx, inplace= True)
 	
 
-	dados_3["Comarca"] = ''
-	dados_3["Vara"] = ''
-	dados_3["Data da Distribuição"] =''
-	dados_3["Data da Sentença"] = ''
+	dados_3["Comarca"] = None
+	dados_3["Vara"] = None
+	dados_3["Data da Distribuição"] = None
+	dados_3["Data da Sentença"] = None
 	dados_3["Origem"] = 'SEEU'
 			
-	print(dados_3)
+	# print(dados_3)
 	# dados_3.to_excel("dados_3.xlsx", index = False)
 
 	##################
@@ -1062,11 +1089,11 @@ def dados_TJCE():
 
 	dados_4["Competência"] = "Estadual"
 
-	dados_4["Comarca"] = ''
-	dados_4["Vara"] = ''
-	dados_4["Data da Distribuição"] =''
-	dados_4["Data da Sentença"] = ''
-	dados_4["Origem"] = ''
+	dados_4["Comarca"] = None
+	dados_4["Vara"] = None
+	dados_4["Data da Distribuição"] = None
+	dados_4["Data da Sentença"] = None
+	dados_4["Origem"] = None
 
 
 	# print(dados_4)
@@ -1111,7 +1138,11 @@ def dados_TJCE():
 
 	dados.loc[dados.Planilha == "TJCE_203", "Origem"] = "SAJ"
 
-	# print(dados)
+	idx = dados.loc[dados.Ano == 8201].index
+
+	dados.drop(idx, inplace= True)
+
+	print(dados)
 	# z = input("")
 
 
@@ -1121,11 +1152,9 @@ def dados_TJCE():
 	path = dir_path + f'\planilhas filtradas'
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_CE.xlsx", index = False)
+			
 
-
-				
-
-# dados_TJCE()
+dados_TJCE()
 
 #################################                  ES               ##################################################
 
@@ -1160,7 +1189,7 @@ def dados_ES():
 
 	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
-	dados ["Origem"] = ""
+	dados ["Origem"] = None
 	dados ["Competência"] = "Estadual"
 	dados ["Planilha"] = 'TJES_1'
 
@@ -1168,7 +1197,8 @@ def dados_ES():
 	dados["Comarca"] = dados["Comarca"].replace(to_replace = r"(?i)comarca da|(?i)comarca de", value = '', regex = True).str.strip()
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
-	# print(dados)
+	
+	print(dados)
 	# z= input("")
 
 
@@ -1179,7 +1209,7 @@ def dados_ES():
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_ES.xlsx", index = False)
 
-# dados_ES()
+dados_ES()
 
 #################################                  GO              ##################################################
 
@@ -1199,7 +1229,7 @@ def dados_GO():
 	dados["Planilha"] = "TJGO_1"
 
 
-	dados["Origem"] = ""
+	dados["Origem"] = None
 
 
 	dados["Competência"] = "Estadual"
@@ -1210,7 +1240,7 @@ def dados_GO():
 
 	# print(dados['Data da Distribuição'])
 
-	dados['Data da Sentença'] = ''
+	dados['Data da Sentença'] = None
 
 	#################################################################
 
@@ -1226,7 +1256,7 @@ def dados_GO():
 	dados_2["Planilha"] = "TJGO_1_2"
 
 
-	dados_2["Origem"] = ""
+	dados_2["Origem"] = None
 
 
 	dados_2["Competência"] = "Estadual"
@@ -1237,7 +1267,7 @@ def dados_GO():
 
 	# print(dados['Data da Distribuição'])
 
-	dados_2['Data da Sentença'] = ''
+	dados_2['Data da Sentença'] = None
 
 
 	#######################################################################
@@ -1274,15 +1304,15 @@ def dados_GO():
 
 	dados_3 = pd.DataFrame({"Número do Processo":lista_num})
 
-	dados_3["Comarca"] = ''
-	dados_3["Vara"] = ''
-	dados_3["Data da Distribuição"] =''
-	dados_3["Data da Sentença"] = ''
-	dados_3["Ano"] = ''
+	dados_3["Comarca"] = None
+	dados_3["Vara"] = None
+	dados_3["Data da Distribuição"] = None
+	dados_3["Data da Sentença"] = None
+	dados_3["Ano"] = None
 	dados_3["Estado"] = 'GO'
 	dados_3["Competência"] = 'Estadual'
 	dados_3['Planilha'] = "TJGO_2"
-	dados_3["Origem"] = ''
+	dados_3["Origem"] = None
 
 
 	######################################################################
@@ -1314,11 +1344,13 @@ def dados_GO():
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
-	# print(dados)
+	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+	
+
+	print(dados)
 	# z = input("")
 
 
-	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -1326,9 +1358,7 @@ def dados_GO():
 	dados.to_excel(".\planilhas filtradas\Dados_GO.xlsx", index = False)
 
 
-
-
-# dados_GO()
+dados_GO()
 
 
 #################################                  4 - MA               ##################################################
@@ -1489,14 +1519,14 @@ def dados_MA():
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
-	# print(dados)
+	print(dados)
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_MA.xlsx", index = False)
 
-# dados_MA()
+dados_MA()
 
 
 
@@ -1566,7 +1596,8 @@ def dados_MG():
 
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
-	# print(dados)
+	
+	print(dados)
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -1574,7 +1605,7 @@ def dados_MG():
 	dados.to_excel(".\planilhas filtradas\Dados_MG.xlsx", index = False)
 
 
-# dados_MG()
+dados_MG()
 
 
 
@@ -1628,12 +1659,14 @@ def dados_MT():
 
 	dados["Planilha"] = 'TJMT_1'
 
+	dados["Origem"] = None
+
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
-
-
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+
+	print(dados)
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -1641,7 +1674,7 @@ def dados_MT():
 	dados.to_excel(".\planilhas filtradas\Dados_MT.xlsx", index = False)
 
 
-# dados_MT()
+dados_MT()
 
 
 #################################                 8 - PA               ##################################################
@@ -1692,9 +1725,13 @@ def dados_PA():
 
 	dados["Planilha"] = "TJPA_1"
 
+	dados["Origem"] = None
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+
+	print(dados)
+	
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -1702,7 +1739,7 @@ def dados_PA():
 	dados.to_excel(".\planilhas filtradas\Dados_PA.xlsx", index = False)
 
 
-# dados_PA()
+dados_PA()
 
 
 #################################                 9 - PB              ##################################################
@@ -1753,6 +1790,10 @@ def dados_PB():
 
 	dados["Comarca"] = comarcas
 
+	dados["Origem"] = None
+
+	dados["Data da Distribuição"] = None
+
 
 	dados["Competência"] = "Estadual"
 	dados["Estado"] = "PB"
@@ -1766,11 +1807,18 @@ def dados_PB():
 
 	dados["Planilha"] = "TJPB_1"
 
+	ano = dados["Número do Processo"].astype(str).str.split(".", expand = True)[1]
+
+	dados["Ano"] = ano.astype(int)
+
+	df_filter = dados ["Ano"] >= 2017
+	dados = dados[df_filter]
+
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
-	# print(dados)
+	print(dados)
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -1778,7 +1826,7 @@ def dados_PB():
 	dados.to_excel(".\planilhas filtradas\Dados_PB.xlsx", index = False)
 
 
-# dados_PB()
+dados_PB()
 
 #################################                 10 - PE              ##################################################
 
@@ -1830,10 +1878,12 @@ def dados_PE():
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado", "Competência", 'Planilha']]
 
-	# print(dados)
+	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+	
+
+	print(dados)
 	# z = input("")
 
-	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -1841,7 +1891,7 @@ def dados_PE():
 	dados.to_excel(".\planilhas filtradas\Dados_PE.xlsx", index = False)
 
 
-# dados_PE()
+dados_PE()
 
 #################################                 10 - PI              ##################################################
 
@@ -1869,7 +1919,7 @@ def dados_PI():
 		'Data Distribuição':'Data da Distribuição'}, 
 		inplace = True)
 
-	dados["Origem"] = ''
+	dados["Origem"] = None
 
 	dados["Planilha"] = 'TJPI_1'
 
@@ -1900,7 +1950,7 @@ def dados_PI():
 	dados_2["Ano"] = dados_2["Ano"].astype(int)
 	dados_2["Estado"] = "PI"
 
-	dados_2["Origem"] = ''
+	dados_2["Origem"] = None
 
 	df_filter = dados_2["Ano"] >= 2017
 	dados_2 = dados_2[df_filter]
@@ -1939,13 +1989,15 @@ def dados_PI():
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
+	print(dados)
+
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_PI.xlsx", index = False)
 
 
-# dados_PI()
+dados_PI()
 
 
 #################################                 11 - PR              ##################################################
@@ -1978,10 +2030,10 @@ def dados_PR():
 
 	dados_2.rename(columns={'Número Único': 'Número do Processo'}, inplace = True)
 	
-	dados_2["Vara"] = ''
-	dados_2["Data da Distribuição"] =''
-	dados_2["Data da Sentença"] = ''
-	dados_2["Origem"] = ''
+	dados_2["Vara"] = None
+	dados_2["Data da Distribuição"] = None
+	dados_2["Data da Sentença"] = None
+	dados_2["Origem"] = None
 
 	dados_2["Planilha"] = 'TJPR_2'
 
@@ -1995,10 +2047,10 @@ def dados_PR():
 
 	dados_3.rename(columns={'Número Único': 'Número do Processo'}, inplace = True)
 	
-	dados_3["Vara"] = ''
-	dados_3["Data da Distribuição"] =''
-	dados_3["Data da Sentença"] = ''
-	dados_3["Origem"] = ''
+	dados_3["Vara"] = None
+	dados_3["Data da Distribuição"] = None
+	dados_3["Data da Sentença"] = None
+	dados_3["Origem"] = None
 
 	dados_3["Planilha"] = 'TJPR_3'
 
@@ -2031,7 +2083,7 @@ def dados_PR():
 	dados = dados[df_filter]
 
 
-	dados["Origem"] = ''
+	dados["Origem"] = None
 
 
 	dados["Competência"] = "Estadual"
@@ -2053,7 +2105,7 @@ def dados_PR():
 
 
 	print(dados)
-	z = input("")
+	# z = input("")
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -2121,7 +2173,7 @@ def dados_RN():
 	dados["Comarca"] = dados["Comarca"].replace(to_replace = r"TJRN - Comarca de|TJRN -  Comarca de", value = '', regex = True).str.strip()
 	dados["Vara"] = dados["Vara"].replace(to_replace = r"TJRN -|-.+", value = '', regex = True).str.strip()
 
-	# print(dados["Vara"])
+	print(dados["Vara"])
 	# z = input("")
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
@@ -2132,7 +2184,7 @@ def dados_RN():
 	dados.to_excel(".\planilhas filtradas\Dados_RN.xlsx", index = False)
 
 
-# dados_RN()
+dados_RN()
 
 #################################                 12 - RJ             ##################################################
 
@@ -2154,7 +2206,7 @@ def dados_RO():
 
 	dados["Data de Distribuição"] = dados["Data de Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]
 	dados["Data do movimento"] = dados["Data do movimento"].astype(str).str.split(" ", n=1, expand = True)[0]
-	ano = dados["Data de Distribuição"].astype(str).str.split("-", n=1, expand = True)[0]
+	ano = dados["Número Processo"].astype(str).str.split(".", expand = True)[1]
 
 	dados["Ano"] = ano.astype(int)
 	dados["Estado"] = "RO"
@@ -2185,7 +2237,7 @@ def dados_RO():
 
 	dados["Planilha"] = "TJRO_1"
 
-	dados["Origem"] = ""
+	dados["Origem"] = None
 
 	# print(dados)
 
@@ -2210,10 +2262,10 @@ def dados_RO():
 	ano_2 = dados_2["Número do Processo"].astype(str).str.split(".", expand = True)[1]
 
 
-	dados_2["Planilha"] = 'TJRN_2'
+	dados_2["Planilha"] = 'TJRO_2'
 
 	dados_2["Ano"] = ano_2.astype(int)
-	dados_2["Estado"] = "RN"
+	dados_2["Estado"] = "RO"
 
 	df_filter = dados_2["Ano"] >= 2017
 	dados_2 = dados_2[df_filter]
@@ -2228,7 +2280,7 @@ def dados_RO():
 
 	dados_2['Data da Sentença'] = dados_2['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
-	dados_2["Origem"] = ""
+	dados_2["Origem"] = None
 
 	#####################################################
 
@@ -2236,15 +2288,23 @@ def dados_RO():
 
 	dados_3.rename(columns={'NR_PROCESSO': 'Número do Processo'}, inplace = True)
 
-	dados_3["Comarca"] = ''
-	dados_3["Vara"] = ''
-	dados_3["Data da Distribuição"] =''
-	dados_3["Data da Sentença"] = ''
-	dados_3["Ano"] = ''
+
+	ano_3 = dados_3["Número do Processo"].astype(str).str.split(".", expand = True)[1]
+
+
+	dados_3["Ano"] = ano_3.astype(int)
+
+	df_filter = dados_3["Ano"] >= 2017
+	dados_3 = dados_3[df_filter]
+
+	dados_3["Comarca"] = None
+	dados_3["Vara"] = None
+	dados_3["Data da Distribuição"] = None
+	dados_3["Data da Sentença"] = None
 	dados_3["Estado"] = 'RO'
 	dados_3["Competência"] = 'Estadual'
 	dados_3['Planilha'] = "TJRO_3"
-	dados_3["Origem"] = ''
+	dados_3["Origem"] = None
 
 
 	##############################################
@@ -2255,8 +2315,7 @@ def dados_RO():
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
-	# print(dados)
-	# z=input("")
+	print(dados)
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado", "Competência", 'Planilha']]
 
@@ -2265,7 +2324,7 @@ def dados_RO():
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_RO.xlsx", index = False)
 
-# dados_RO()
+dados_RO()
 
 
 #################################                 14 - RR             ##################################################
@@ -2309,17 +2368,18 @@ def dados_RR():
 
 	dados = dados_2[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado", "Competência", 'Planilha']]
 
-	# print(dados)
+	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+	
+	print(dados)
 	# z= input("")
 
-	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_RR.xlsx", index = False)
 
-# dados_RR()
+dados_RR()
 
 
 #################################                 15 - RS             ##################################################
@@ -2455,13 +2515,10 @@ def dados_SE():
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
+	dados.drop_duplicates(subset="Número do Processo", inplace= True)
+	
 	print(dados)
 
-	dados.drop_duplicates(subset="Número do Processo", inplace= True)
-
-	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado", "Competência","Planilha"]]
-	# print(dados)
-	# z = input("")
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -2470,7 +2527,7 @@ def dados_SE():
 
 
 
-# dados_SE()
+dados_SE()
 #################################                 16 - SC             ##################################################
 
 # não mandou os números dos processos
@@ -2539,7 +2596,7 @@ def dados_SP():
 	planilha_2["Planilha"] = "TJSP_2"
 
 
-	planilha_2["Origem"] = ""
+	planilha_2["Origem"] = None
 
 
 	planilha_2["Competência"] = "Estadual"
@@ -2570,10 +2627,10 @@ def dados_SP():
 	planilha_3["Planilha"] = "TJSP_3"
 
 
-	planilha_3["Origem"] = ""
+	planilha_3["Origem"] = None
 
 
-	planilha_3["Competência"] = "TJM Estadual"
+	planilha_3["Competência"] = "Estadual"
 
 	planilha_3['Data da Distribuição'] = pd.to_datetime(planilha_3['Data da Distribuição'])
 
@@ -2619,13 +2676,9 @@ def dados_SP():
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
-	print(dados)
-	z = input("")
-
-
-
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado", "Competência","Planilha"]]
-	# print(dados)
+
+	print(dados)
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -2633,7 +2686,7 @@ def dados_SP():
 	dados.to_excel(".\planilhas filtradas\Dados_SP.xlsx", index = False)
 
 
-# dados_SP()
+dados_SP()
 
 
 #################################                 18 - TO             ##################################################
@@ -2670,6 +2723,8 @@ def dados_TO():
 	planilha_1["Planilha"] = "TJTO_1"
 
 	planilha_1["Estado"] = 'TO'
+
+	planilha_1["Competência"] = 'Estadual'
 
 
 	# print(planilha_1)
@@ -2713,6 +2768,8 @@ def dados_TO():
 	planilha_2["Planilha"] = "TJTO_2"
 
 	planilha_2["Estado"] = 'TO'
+
+	planilha_2["Competência"] = "Estadual"
 	
 
 	########################
@@ -2767,10 +2824,10 @@ def dados_TO():
 	planilha_4["Competência"] = "Estadual"
 
 
-	planilha_4["Comarca"] = ''
-	planilha_4["Vara"] = ''
-	planilha_4["Data da Distribuição"] =''
-	planilha_4["Data da Sentença"] = ''
+	planilha_4["Comarca"] = None
+	planilha_4["Vara"] = None
+	planilha_4["Data da Distribuição"] = None
+	planilha_4["Data da Sentença"] = None
 	planilha_4["Estado"] = 'TO'
 
 
@@ -2841,11 +2898,10 @@ def dados_TO():
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
-	# print(dados)
-	# z = input("")
-
-
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+	
+
+	print(dados)
 
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -2854,7 +2910,7 @@ def dados_TO():
 	dados.to_excel(".\planilhas filtradas\Dados_TO.xlsx", index = False)
 
 
-# dados_TO()
+dados_TO()
 
 
 
@@ -2895,6 +2951,8 @@ def dados_TRF2():
 
 	######
 
+	dados["Tribunal"] = "TRF2"
+
 	dados["Planilha"] = "TRF_2"
 
 	dados["Competência"] = "Federal"
@@ -2907,7 +2965,7 @@ def dados_TRF2():
 
 	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
-	dados["Origem"] =''
+	dados["Origem"] = None
 
 	dados['Número do Processo'] = dados['Número do Processo'].astype(str)
 
@@ -2931,7 +2989,7 @@ def dados_TRF2():
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
-	# print(dados)
+	print(dados)
 	# z = input("")
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
@@ -2944,7 +3002,7 @@ def dados_TRF2():
 
 
 
-# dados_TRF2()
+dados_TRF2()
 
 
 #################################                 20 - TRF 3            ##################################################
@@ -2973,6 +3031,8 @@ def dados_TRF3():
 
 
 	###################### Não temos a data de distribuição dos processos do SEEU #######################
+
+
 
 
 	planilha = pd.read_excel(".\Planilhas tribunais\TRF_3.xlsx", engine ='openpyxl', sheet_name='SEEU _ Morte Agente')
@@ -3097,14 +3157,17 @@ def dados_TRF3():
 	df_filter = dados ["Ano"] >= 2017
 	dados = dados[df_filter]
 
-	dados["Vara"] =''
-	
+	dados["Vara"] = None
+
+	dados["Tribunal"] = "TRF3"	
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
-	# print(dados)
 	# z = input("")
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+
+	print(dados)
+
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -3112,7 +3175,7 @@ def dados_TRF3():
 	dados.to_excel(".\planilhas filtradas\Dados_TRF3.xlsx", index = False)
 
 
-# dados_TRF3()
+dados_TRF3()
 
 
 
@@ -3155,9 +3218,33 @@ def dados_TRF4():
 
 	dados["Competência"] = "Federal"
 
+	try:
+		dados['Número do Processo'] = dados['Número do Processo'].astype(str).str.replace("-","")
+	except:
+		pass
+	try:
+		dados['Número do Processo'] = dados['Número do Processo'].astype(str).str.replace(".","")
+	except:
+		pass	
 
+	dados['Número do Processo'] = dados['Número do Processo'].astype(str)
+
+	# ajuste no número do processo
+
+	fim = dados["Número do Processo"].astype(str).str[-4:]
+	est = dados["Número do Processo"].astype(str).str[-6:-4]
+	just = dados["Número do Processo"].astype(str).str[-7]
+	ano_aj = dados["Número do Processo"].astype(str).str[-11:-7]
+	cod = dados["Número do Processo"].astype(str).str[-13:-11]
+	rest = dados["Número do Processo"].astype(str).str[:-13]
+
+	dados["Número do Processo"] = rest+"-"+cod+"."+ano_aj+"."+just+"."+est+"."+fim
+	
+	ano_dados = ano_aj.astype(int)
+	dados["Ano"] = ano_dados
 	df_filter = dados ["Ano"] >= 2017
 	dados = dados[df_filter]
+
 
 	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
 
@@ -3171,19 +3258,23 @@ def dados_TRF4():
 
 	dados["Tribunal"] = "TRF4"
 
-	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Tribunal","Competência"]]
+	dados["Planilha"] = "TRF_4"
+
+	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Tribunal","Competência","Planilha"]]
 	# print(dados)
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
+	print(dados)
+
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
 	Path(path).mkdir(parents=True, exist_ok=True)
-	dados.to_excel(".\planilhas filtradas\Dados_TRF_4.xlsx", index = False)
+	dados.to_excel(".\planilhas filtradas\Dados_TRF4.xlsx", index = False)
 
 
 
-# dados_TRF4()
+dados_TRF4()
 
 
 ####################################################################################################################################################
@@ -3201,7 +3292,7 @@ def dados_TRF5():
 
 
 	######
-	dados["Origem"] = ''
+	dados["Origem"] = None
 
 	dados["Planilha"] = "TRF_5"
 
@@ -3211,9 +3302,9 @@ def dados_TRF5():
 
 	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
 
-	dados['Data da Sentença'] = ''
+	dados['Data da Sentença'] = None
 	
-	dados['Comarca'] =''
+	dados['Comarca'] = None
 
 	#################################################
 
@@ -3230,7 +3321,7 @@ def dados_TRF5():
 
 	######
 
-	dados_2["Origem"] = ''
+	dados_2["Origem"] = None
 
 	dados_2["Planilha"] = "TRF_5_2"
 
@@ -3244,7 +3335,7 @@ def dados_TRF5():
 
 	dados_2['Data da Sentença'] = dados_2['Data da Sentença'].dt.strftime('%d-%m-%Y')
 	
-	dados_2['Comarca'] =''
+	dados_2['Comarca'] = None
 
 
 	######################
@@ -3261,7 +3352,7 @@ def dados_TRF5():
 
 	######
 
-	dados_3["Origem"] = ''
+	dados_3["Origem"] = None
 
 	dados_3["Planilha"] = "TRF_5_3"
 
@@ -3275,7 +3366,7 @@ def dados_TRF5():
 
 	dados_3['Data da Sentença'] = dados_3['Data da Sentença'].dt.strftime('%d-%m-%Y')
 	
-	dados_3['Comarca'] =''
+	dados_3['Comarca'] = None
 
 
 	######################
@@ -3308,11 +3399,13 @@ def dados_TRF5():
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
-	# print(dados)
 	# z = input("")
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
+	dados["Tribunal"] = "TRF5"
+
+	print(dados)
 
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -3321,7 +3414,7 @@ def dados_TRF5():
 	dados.to_excel(".\planilhas filtradas\Dados_TRF5.xlsx", index = False)
 
 
-# dados_TRF5()
+dados_TRF5()
 
 
 ####################################################################################################################################################
@@ -3351,14 +3444,14 @@ def seleciona_amostra():
 	for trib in selct:
 		df_filter = planilha["Tribunal"] == trib
 		planilha_1 = planilha[df_filter]
-		amostra_trib = planilha_1.sample(9)
+		amostra_trib = planilha_1.sample(10)
 		amostras = pd.concat([amostras,amostra_trib])
 
-	amostras.drop(columns ="Checagem", inplace= True)	
+
 	
 	# print(amostras)
 
-	amostras.to_excel("Amostra_teste_1_2.xlsx", index = False)
+	amostras.to_excel("Amostra_teste_2.xlsx", index = False)
 
 # seleciona_amostra()
 
