@@ -43,11 +43,8 @@ def ler_JSON():
 			inplace = True)
 
 
-	# df['Estado'] = df['Estado'].str[2:].str.strip()
 	df['Competência'] = df['Competência'].str.split(" ",n=1, expand = True)[1]
 
-
-	# print(df["Data da Sentença"].head(10))
 
 
 	df['Data da Sentença'] = df['Data da Sentença'].str[0:4]+"-"+df['Data da Sentença'].str[4:6]+'-'+df['Data da Sentença'].str[6:8]
@@ -57,6 +54,7 @@ def ler_JSON():
 
 	# print(df["Data da Sentença"].head(10))
 
+
 	df['Data da Sentença'] = pd.to_datetime(df['Data da Sentença'])
 
 	df['Data da Sentença'] = df['Data da Sentença'].dt.strftime('%d-%m-%Y')
@@ -64,12 +62,6 @@ def ler_JSON():
 	df['Data da Distribuição'] = pd.to_datetime(df['Data da Distribuição'])
 
 	df['Data da Distribuição'] = df['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-
-	# print(df["Data da Sentença"].head(10))
-	
-
-	# z= input("")
 
 
 	df["Origem"] = "JSON_DATAJUD"
@@ -127,20 +119,21 @@ def unificador():
 	planilha_2.drop_duplicates(subset="Número do Processo", inplace= True)
 
 
-	planilha_final = planilha.merge(planilha_2 , on = "Número do Processo", how = "left") 
+	planilha_final = planilha.merge(planilha_2 , on = "Número do Processo", how = "left")
 
-	# planilha_final.drop_duplicates(subset="Número do Processo", inplace= True)
+	# print("LAIS tem", len(planilha))
+	# print("Json tem",len(planilha_2))
+	# print("Unificada tem", len(planilha_final))
 
-	# planilha_final.to_excel("Dados_unificados_JSON_LAI.xlsx", index = False)
+	# z= input("")
 
 
 
 	planilha_final['Data da Distribuição_x'] = planilha_final['Data da Distribuição_x'].fillna(planilha_final['Data da Distribuição_y'])
 	planilha_final['Data da Sentença_x'] = planilha_final['Data da Sentença_x'].fillna(planilha_final['Data da Sentença_y'])
-	# planilha_final['Origem_dados_x'] = planilha_final['Origem_dados_x'].fillna(planilha_final['Origem_dados_y'])
+	planilha_final['Origem_dados_x'] = planilha_final['Origem_dados_x'].fillna(planilha_final['Origem_dados_y'])
 
 
-	############## preciso dropar todas as colunas Y antes de fazer isso aqui  ####################
 	planilha_final.drop(columns=["Vara_y", "Origem_y","Data da Distribuição_y","Data da Sentença_y","Ano_y","Tribunal_y","Competência_y","Origem_dados_y","Estado_y"], inplace= True)
 
 
@@ -149,43 +142,18 @@ def unificador():
 			inplace = True)
 
 
-	print(planilha_final)
+	# print(planilha_final.info())
 
 	planilha_final = pd.concat([planilha_final,planilha_2])
 	
 	planilha_final.drop_duplicates(subset="Número do Processo", inplace= True)
+
+	# print(planilha_final.info())	
+
 	
-
-	planilha_final['Planilha'] = planilha_final['Planilha'].fillna(planilha_2['Origem_dados'])
-	
-	print(planilha_final)
-
-	# planilha_final.to_excel("Dados_unificados_JSON_LAI.xlsx", index = False)
-	# z= input("")
+	# z = input()
 
 
-	codigo = planilha_final["Número do Processo"].astype(str).str[-4:].to_list()
-	estado = planilha_final["Estado"].to_list()
-
-
-
-	comarcas = []
-	for cod, est in tqdm(zip(codigo,estado)):
-		try:
-			array_estado = Comarcas(est) 
-			for k in range(len(array_estado)):
-				comarca = None
-				if array_estado[k][0] == cod:
-					comarca = array_estado[k][2]
-					break
-			comarcas.append(comarca)
-		except:
-			comarcas.append(None)
-
-
-	planilha_final["Comarcas_aux"] = comarcas
-
-	planilha_final['Comarca'] = planilha_final['Comarca'].fillna(planilha_final['Comarcas_aux'])
 
 	planilha_final['Comarca'] = planilha_final['Comarca'].str.lower().str.strip()
 
@@ -220,7 +188,7 @@ def unificador():
 	df_filter = planilha_final["Ano"] < 2022
 	planilha_final = planilha_final[df_filter]
 	
-	planilha_final.drop(columns=["Comarcas_aux"], inplace= True)
+
 
 	print(planilha_final)
 
@@ -255,7 +223,7 @@ def unificador_SEEU():
 
 	planilha_2['Comarca'] = planilha_2['Comarca'].replace(to_replace = r".+- ", value = '', regex = True).str.strip()
 
-	planilha_2["Competência"] = np.where(planilha_2['Estado'].isnull() == True, "Federal","Estadual")
+	planilha_2["Competência"] = np.where((planilha_2['Tribunal'] == "TRF5")|(planilha_2['Tribunal'] == "TRF4")|(planilha_2['Tribunal'] == "TRF3")|(planilha_2['Tribunal'] == "TRF2")|(planilha_2['Tribunal'] == "TRF1"), "Federal","Estadual")
 
 
 
@@ -278,6 +246,12 @@ def unificador_SEEU():
 
 	planilha_final = planilha.merge(planilha_2 , on = "Número do Processo", how = "left")
 
+	# print("LAIS_JSON tem", len(planilha))
+	# print("SEEU tem",len(planilha_2))
+	# print("Unificada tem", len(planilha_final))
+
+	# z= input("")
+
 
 	planilha_final['Comarca_x'] = planilha_final['Comarca_x'].fillna(planilha_final['Comarca_y'])
 	planilha_final['Estado_x'] = planilha_final['Estado_x'].fillna(planilha_final['Estado_y'])
@@ -286,11 +260,18 @@ def unificador_SEEU():
 
 	planilha_final.drop(columns=["Comarca_y", "Tribunal_y","Origem_y","Origem_dados_y","Estado_y","Ano_y","Competência_y","Planilha_y"], inplace= True)
 
+	
+
+	#### ajustar as datas de nascimento
+
+	planilha_final["dt_nasc"] = planilha_final["dt_nasc"].astype(str)
+
+	planilha_final["dt_nasc"] = pd.to_datetime(planilha_final["dt_nasc"], errors='coerce')
+
+	planilha_final["dt_nasc"] = planilha_final["dt_nasc"].dt.strftime('%d-%m-%Y')
 
 
-	dados_nasc = planilha_final['dt_nasc'].astype(str).str[-2:]+"-"+planilha_final['dt_nasc'].astype(str).str[-5:-3]+"-"+planilha_final['dt_nasc'].astype(str).str[:4]
-
-	planilha_final["dt_nasc"] = np.where(planilha_final['dt_nasc'].isnull() == False, dados_nasc,'')
+	#############
 	
 
 	planilha_final.rename(columns={'Planilha_x':'Planilha','Vara_x':'Vara','Data da Distribuição_x': "Data da Distribuição", "Data da Sentença_x": "Data da Sentença",
@@ -335,7 +316,11 @@ def unificador_SEEU():
 	planilha_final['Comarca'] = planilha_final['Comarca'].replace(to_replace = r"comarca de|comarca da", value = '', regex = True).str.strip()
 
 	print(planilha_final)
+	print(planilha_final.info())
 
+	# z = input('')
+
+	planilha_final.to_csv("Dados_unificados_JSON_LAI_SEEU.csv", index = False)
 	planilha_final.to_excel("Dados_unificados_JSON_LAI_SEEU.xlsx", index = False)
 
 

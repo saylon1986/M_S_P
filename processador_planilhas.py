@@ -19,7 +19,7 @@ def main():
 
 	for planilha in lista_planilhas_a_ler:
 	#	print("Nome da planilha a ler: ", planilha)
-		dados_planilhas_lidas.append(pd.read_excel(planilha, dtype="object", engine ='openpyxl'))
+		dados_planilhas_lidas.append(pd.read_excel(planilha,engine ='openpyxl'))
 	#	print("Lida!")
 
 	todos_dados = todos_dados.append(dados_planilhas_lidas, ignore_index=True, sort=False)
@@ -30,11 +30,15 @@ def main():
 	todos_dados["Comarca"] = todos_dados["Comarca"].str.lower() 
 	todos_dados["Vara"] = todos_dados["Vara"].str.lower()
 
+	df_filter = todos_dados["Ano"] < 2022
+	todos_dados = todos_dados[df_filter]
+
 	todos_dados.to_excel("Dados_compilados_2.xlsx", index=False)
 	print(todos_dados)
+	print(todos_dados.info())
 
-main()
-z= input("")
+
+# z= input("")
 
 
 
@@ -79,18 +83,54 @@ def dados_AC():
 	planilha_9 = pd.read_excel(".\Planilhas tribunais\TJAC_9.xlsx", engine ='openpyxl', 
 		usecols = ["Processo","Foro / Vara","Data Distribuição","Data da Movimentação"])
 	planilha_10 = pd.read_excel(".\Planilhas tribunais\TJAC_10.xlsx", engine ='openpyxl', 
-		usecols = ["Processo","Foro / Vara","Data Distribuição"])
+		usecols = ["Processo","Foro / Vara","Data Distribuição","Data da Movimentação"])
 
 	planilha_1["Planilha"] = "TJAC_1"
 	planilha_2["Planilha"] = "TJAC_2"
 	planilha_3['Planilha'] = "TJAC_3"
 	planilha_4['Planilha'] = "TJAC_4"
+	
+
+
+	planilha_4["Data Distribuição"] = pd.to_datetime(planilha_4["Data Distribuição"])
+	planilha_4["Data Distribuição"] = planilha_4["Data Distribuição"].dt.strftime("%d-%m-%Y %H:%M:%S")
+	planilha_4["Data da Movimentação"] = pd.to_datetime(planilha_4["Data da Movimentação"])
+	planilha_4["Data da Movimentação"] = pd.to_datetime(planilha_4["Data da Movimentação"]).dt.strftime("%d-%m-%Y %H:%M:%S")
+
 	planilha_5['Planilha'] = "TJAC_5"
 	planilha_6['Planilha'] = "TJAC_6"
 	planilha_8['Planilha'] = "TJAC_8"
+
+	planilha_8["Data Distribuição"] = pd.to_datetime(planilha_8["Data Distribuição"])
+	planilha_8["Data Distribuição"] = planilha_8["Data Distribuição"].dt.strftime("%d-%m-%Y %H:%M:%S")
+	planilha_8["Data da Movimentação"] = pd.to_datetime(planilha_8["Data da Movimentação"])
+	planilha_8["Data da Movimentação"] = planilha_8["Data da Movimentação"].dt.strftime("%d-%m-%Y %H:%M:%S")
+	
 	planilha_9['Planilha'] = "TJAC_9"
+
+	planilha_9["Data Distribuição"] = pd.to_datetime(planilha_9["Data Distribuição"])
+	planilha_9["Data Distribuição"] = planilha_9["Data Distribuição"].dt.strftime("%d-%m-%Y %H:%M:%S")
+	planilha_9["Data da Movimentação"] = pd.to_datetime(planilha_9["Data da Movimentação"])
+	planilha_9["Data da Movimentação"] = planilha_9["Data da Movimentação"].dt.strftime("%d-%m-%Y %H:%M:%S")
+	
 	planilha_10['Planilha'] = "TJAC_10"
 
+	planilha_10["Data Distribuição"] = pd.to_datetime(planilha_10["Data Distribuição"])
+	planilha_10["Data Distribuição"] = planilha_10["Data Distribuição"].dt.strftime("%d-%m-%Y %H:%M:%S")
+	planilha_10["Data da Movimentação"] = pd.to_datetime(planilha_10["Data da Movimentação"])
+	planilha_10["Data da Movimentação"] = planilha_10["Data da Movimentação"].dt.strftime("%d-%m-%Y %H:%M:%S")
+
+	# print(planilha_5['Data Distribuição'][0],"5")
+	# print(planilha_6['Data Distribuição'][0],"6")
+	# print(planilha_7_1['Data Distribuição'][0],"7_1")
+	# print(planilha_7_2['Data Distribuição'][0],"7_2")
+	# print(planilha_7_3['Data Distribuição'][0],"7_3")
+	# print(planilha_7_4['Data Distribuição'][0],"7_4")
+	# print(planilha_7_5['Data Distribuição'][0],"7_5")
+	# print(planilha_8['Data Distribuição'][1],"8")
+	# print(planilha_9['Data Distribuição'][1],"9")
+	# print(planilha_10['Data Distribuição'][1],"10")
+	# z = input("")
 
 	dados = pd.concat([planilha_1, planilha_2, planilha_3,planilha_4,planilha_5,planilha_6, planilha_7_1,planilha_7_2,planilha_7_3,planilha_7_4,planilha_7_5,
 		planilha_8,planilha_9,planilha_10])
@@ -108,11 +148,17 @@ def dados_AC():
 	dados["Vara"] = corte[1].str.strip()
 
 
+
+
+
 	dados["Data Distribuição"] = dados["Data Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
 	try:
 		dados["Data da Movimentação"] = dados["Data da Movimentação"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
 	except:
 		dados["Data da Movimentação"] = None
+
+
+
 	ano = dados["Processo"].astype(str).str.split(".", expand = True)[1]
 
 	dados["Ano"] = ano.astype(int)
@@ -121,6 +167,7 @@ def dados_AC():
 	df_filter = dados ["Ano"] >= 2017
 	dados = dados[df_filter]
 
+
 	dados.rename(columns={'Processo': 'Número do Processo', 
 		'Data da Movimentação': 'Data da Sentença', 
 		'Data Distribuição':'Data da Distribuição'},
@@ -128,13 +175,10 @@ def dados_AC():
 
 	dados["Competência"] = "Estadual"
 
-	dados.drop_duplicates(subset="Número do Processo", inplace = True)
-
-	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
-	# print(dados)
 
 	dados["Número do Processo"] = dados["Número do Processo"].astype(str).str.replace("-","")
 	dados["Número do Processo"] = dados["Número do Processo"].astype(str).str.replace(".","")
+	# print(dados)
 
 	# ajuste no número do processo
 
@@ -146,27 +190,22 @@ def dados_AC():
 	rest = dados["Número do Processo"].astype(str).str[:-13]
 
 	dados["Número do Processo"] = rest+"-"+cod+"."+ano_aj+"."+just+"."+est+"."+fim
+	
 
+	dados.drop_duplicates(subset="Número do Processo", inplace = True)
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 	print(dados)
-	# z= input('')
+	print(dados.info())
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_AC.xlsx", index = False, encoding='iso-8859-1')
 
-dados_AC()
+
 
 
 #################################                  2- Al               ##################################################
@@ -179,10 +218,9 @@ def dados_AL():
 	dados = planilha[["Foro","Vara","Processo","Data da distribuição"]]
 
 	dados["Data da distribuição"] = dados["Data da distribuição"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
-	try:
-		dados["Data da Movimentação"] = dados["Data da Movimentação"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
-	except:
-		dados["Data da Movimentação"] = ''
+
+	
+	dados["Data da Movimentação"] = None
 	ano = dados["Processo"].astype(str).str.split(".", expand = True)[1]
 
 	
@@ -198,6 +236,8 @@ def dados_AL():
 		'Data da Movimentação': 'Data da Sentença', 
 		'Data da distribuição':'Data da Distribuição', 'Foro': 'Comarca'},
 	 inplace = True)
+
+	
 
 
 	# dados ["codigo"] = dados["Número do Processo"].astype(str).str.split(".", expand = True)[4]
@@ -222,7 +262,7 @@ def dados_AL():
 	dados["Planilha"] = "TJAL_1"
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
-	print(dados)
+	
 
 	dados["Número do Processo"] = dados["Número do Processo"].astype(str).str.replace("-","")
 	dados["Número do Processo"] = dados["Número do Processo"].astype(str).str.replace(".","")
@@ -238,16 +278,8 @@ def dados_AL():
 
 	dados["Número do Processo"] = rest+"-"+cod+"."+ano_aj+"."+just+"."+est+"."+fim
 
-
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
+	print(dados)
+	print(dados.info())
 
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -257,7 +289,7 @@ def dados_AL():
 
 
 
-dados_AL()
+
 
 
 
@@ -266,10 +298,52 @@ dados_AL()
 
 def dados_AM():
 
-	planilha_1 = pd.read_excel(".\Planilhas tribunais\TJAM_1.xlsx", engine ='openpyxl')
+	planilha_1 = pd.read_excel(".\Planilhas tribunais\TJAM_1.xlsx", engine ='openpyxl', sheet_name ='Extinta-Puni-MorteAgente-VEP')
 	
-	dados = planilha_1[["Foro","Vara","Processo","Data da Mov. Decisão", "Data de Recebimento"]]
+	planilha_1 = planilha_1[["Foro","Vara","Processo","Data da Mov. Decisão", "Data de Recebimento"]]
+
+	planilha_1['Origem'] = "SAJ/PROJUDI"
+
+	planilha_1["Planilha"] = "TJAM_1"
+
+
+
+	p_1_1 = planilha_1.iloc[:768,:]
+
+	p_1_2 = planilha_1.iloc[768:,:]
+
+
+
+
+	p_1_1["Data da Mov. Decisão"] = pd.to_datetime(p_1_1["Data da Mov. Decisão"])
+	p_1_1["Data da Mov. Decisão"] = p_1_1["Data da Mov. Decisão"].dt.strftime("%d-%m-%Y %H:%M:%S")
+	p_1_1["Data de Recebimento"] = pd.to_datetime(p_1_1["Data de Recebimento"])
+	p_1_1["Data de Recebimento"] = p_1_1["Data de Recebimento"].dt.strftime("%d-%m-%Y %H:%M:%S")
+
+
+
+
+	planilha_1 = pd.concat([p_1_1,p_1_2])
+
+
+
+
+	planilha_1_2 = pd.read_excel(".\Planilhas tribunais\TJAM_1.xlsx", engine ='openpyxl', sheet_name ='SEEU')
 	
+	planilha_1_2 = planilha_1_2[["Foro","Vara","Processo","Data da Mov. Decisão", "Data de Recebimento"]]
+	
+	planilha_1_2['Origem'] = "SEEU"
+
+	planilha_1_2["Planilha"] = "TJAM_1_2"
+
+
+
+
+	dados = pd.concat([planilha_1, planilha_1_2])
+
+	dados["Estado"] = "AM"
+
+
 
 	dados["Data de Recebimento"] = dados["Data de Recebimento"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
 	dados["Data da Mov. Decisão"] = dados["Data da Mov. Decisão"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
@@ -287,33 +361,7 @@ def dados_AM():
 
 	ano = dados["Processo"].astype(str).str.split(".", expand = True)[1]
 
-
-
-
-	# print(cortados)
-
-	# # até 806 SAJ projudi
-	# ano_p1 = cortados[0][0:806]
-
-	# # depois = SEEU
-	# ano_p2 = cortados[2][807:]
-
-	# anos = pd.concat([ano_p1,ano_p2])
-	# # print(anos)
-
-	dados["Ano"] = ano.astype(int)
-	dados["Estado"] = "AM"
-
-	origem =[]
-	for k in range(len(dados["Ano"])):
-		if k < 806:
-			origem.append("SAJ/PROJUDI")
-		else:
-			origem.append("SEEU")
-
-	dados['Origem'] = origem
- 
-
+	dados ["Ano"] = ano.astype(int)
 	df_filter = dados ["Ano"] >= 2017
 	dados = dados[df_filter]
 
@@ -321,7 +369,7 @@ def dados_AM():
 		'Data de Recebimento': 'Data da Distribuição', 'Foro':'Comarca'}, 
 		inplace = True)
 
-
+	
 
 	dados["Comarca"] = dados["Comarca"].astype(str).str.split("-", n=1, expand = True)[1]
 	cortados = dados["Vara"].astype(str).str.split("-", n=2, expand = True)
@@ -342,19 +390,8 @@ def dados_AM():
 
 	dados["Competência"] = "Estadual"
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
-	dados["Planilha"] = "TJAM_1"
-
-
+	
+	
 	## processamento da segunda planilha
 
 	planilha_2 = pd.read_excel(".\Planilhas tribunais\TJAM_2.xlsx", sheet_name= 'Morte do agente - SAJ', engine ='openpyxl')
@@ -363,9 +400,9 @@ def dados_AM():
 
 	dados_2["Data da distribuição"] = dados_2["Data da distribuição"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
 
+
 	ano_2 = dados_2["Processo"].astype(str).str.split(".", expand = True)[1]
 
-	# print(ano_2)
 	dados_2["Ano"] = ano_2.astype(int)
 	dados_2["Estado"] = "AM"
 	dados_2["Competência"] = "Estadual"
@@ -373,10 +410,6 @@ def dados_AM():
 
 	
 	dados_2.rename(columns={'Processo': 'Número do Processo', 'Data da distribuição': 'Data da Distribuição'}, inplace = True)
-
-	dados_2['Data da Distribuição'] = pd.to_datetime(dados_2['Data da Distribuição'])
-
-	dados_2['Data da Distribuição'] = dados_2['Data da Distribuição'].dt.strftime('%d-%m-%Y')
 
 	df_filter_2 = dados_2 ["Ano"] >= 2017
 	dados_2 = dados_2[df_filter_2]
@@ -417,9 +450,6 @@ def dados_AM():
 	dados_3.rename(columns={'processo': 'Número do Processo', 'data da distribuição': 'Data da Distribuição', 'vara': 'Vara', 'data da movimentação':'Data da Sentença', 
 		'comarca': 'Comarca'}, inplace = True)
 
-	dados_3['Data da Distribuição'] = pd.to_datetime(dados_3['Data da Distribuição'])
-
-	dados_3['Data da Distribuição'] = dados_3['Data da Distribuição'].dt.strftime('%d-%m-%Y')
 
 
 	df_filter_3 = dados_3["Ano"] >= 2017
@@ -480,23 +510,16 @@ def dados_AM():
 		inplace = True)
 
 
-
-
 	dados_4["Competência"] = "Estadual"
 
-	dados_4['Data da Distribuição'] = pd.to_datetime(dados_4['Data da Distribuição'])
-
-	dados_4['Data da Distribuição'] = dados_4['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados_4['Data da Sentença'] = pd.to_datetime(dados_4['Data da Sentença'])
-
-	dados_4['Data da Sentença'] = dados_4['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 	dados_4["Planilha"] = "TJAM_2_3"
 
 
+	dados_4['Data da Distribuição'] = pd.to_datetime(dados_4['Data da Distribuição'])
+	dados_4['Data da Distribuição'] = dados_4['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados_4["Data da Sentença"] = pd.to_datetime(dados_4["Data da Sentença"])
+	dados_4["Data da Sentença"] = dados_4["Data da Sentença"].dt.strftime("%d-%m-%Y")
 
 
 	## união das planilhas 
@@ -507,15 +530,6 @@ def dados_AM():
 
 	# print(dados)
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 	dados["Comarca"] = dados["Comarca"].replace(to_replace ="Fórum de|Comarca de", value = '', regex = True).str.strip()
 	
@@ -523,15 +537,12 @@ def dados_AM():
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
 	print(dados)
+	print(dados.info())
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_AM.xlsx", index = False)
-
-
-dados_AM()
-
 
 
 
@@ -751,26 +762,18 @@ def dados_AP():
 	dados = dados[df_filter]
 
 
-	dados["Competência"] = "Estadual"
-
-
 	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
 
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
+	dados["Competência"] = "Estadual"
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 	# print(dados)
 
-
 	print(dados)
-
+	print(dados.info())
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
@@ -781,7 +784,6 @@ def dados_AP():
 
 
 
-dados_AP()
 
 ###################################  BA ###############################################
 
@@ -892,10 +894,6 @@ def dados_BA():
 	df_ba = df_ba[df_filter]
 
 
-	df_ba['Data da Sentença'] = pd.to_datetime(df_ba['Data da Sentença'])
-
-	df_ba['Data da Sentença'] = df_ba['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
 	df_ba ["Estado"] = "BA"
 	df_ba ["Origem"] = ""
 	df_ba ["Competência"] = "Estadual"
@@ -905,8 +903,16 @@ def dados_BA():
 
 	dados = df_ba
 
+
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 	print(dados)
+	print(dados.info())
 
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
@@ -917,11 +923,11 @@ def dados_BA():
 	dados.to_excel(".\planilhas filtradas\Dados_BA.xlsx", index = False)
 
 
-dados_BA()
+
 
 ######################################################################################################################
 
-def dados_TJCE():
+def dados_CE():
 
 	dados_pdf =[]
 	nome_planilha = []
@@ -1013,7 +1019,7 @@ def dados_TJCE():
 	# print(dados_2["Número do Processo"])
 
 
-	###############################33333
+	###############################
 
 	dados_pdf =[]
 	nome_planilha = []
@@ -1142,11 +1148,11 @@ def dados_TJCE():
 
 	dados.drop(idx, inplace= True)
 
-	print(dados)
-	# z = input("")
-
-
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+
+	print(dados)
+	print(dados.info())
+
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -1154,7 +1160,7 @@ def dados_TJCE():
 	dados.to_excel(".\planilhas filtradas\Dados_CE.xlsx", index = False)
 			
 
-dados_TJCE()
+
 
 #################################                  ES               ##################################################
 
@@ -1179,16 +1185,6 @@ def dados_ES():
 	dados = dados[df_filter]
 
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
 	dados ["Origem"] = None
 	dados ["Competência"] = "Estadual"
 	dados ["Planilha"] = 'TJES_1'
@@ -1196,20 +1192,35 @@ def dados_ES():
 
 	dados["Comarca"] = dados["Comarca"].replace(to_replace = r"(?i)comarca da|(?i)comarca de", value = '', regex = True).str.strip()
 
+	anos_distr = dados["Data da Distribuição"].str[-2:]
+
+	dados['Data da Distribuição'] = (dados['Data da Distribuição'].str[:-2]+"20"+anos_distr).replace(to_replace = r"/", value = '-', regex = True)
+
+
+	anos_sent = dados["Data da Sentença"].str[-2:]
+
+	dados["Data da Sentença"] = (dados["Data da Sentença"].str[:-2]+"20"+anos_sent).replace(to_replace = r"/", value = '-', regex = True)
+
+
+	# dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'], format = "%d-%m-%Y")
+	# # dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	# dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	# dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 	
-	print(dados)
-	# z= input("")
-
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+	
+	print(dados)
+	print(dados.info())
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_ES.xlsx", index = False)
 
-dados_ES()
+
 
 #################################                  GO              ##################################################
 
@@ -1234,10 +1245,6 @@ def dados_GO():
 
 	dados["Competência"] = "Estadual"
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
 	# print(dados['Data da Distribuição'])
 
 	dados['Data da Sentença'] = None
@@ -1261,9 +1268,6 @@ def dados_GO():
 
 	dados_2["Competência"] = "Estadual"
 
-	dados_2['Data da Distribuição'] = pd.to_datetime(dados_2['Data da Distribuição'])
-
-	dados_2['Data da Distribuição'] = dados_2['Data da Distribuição'].dt.strftime('%d-%m-%Y')
 
 	# print(dados['Data da Distribuição'])
 
@@ -1340,6 +1344,12 @@ def dados_GO():
 	df_filter = dados ["Ano"] >= 2017
 	dados = dados[df_filter]
 
+
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+
+
+
 	dados["Vara"] = dados["Vara"].replace(to_replace = r"(?i)Ju(í|i)zo d(a|o)|-.+", value = '', regex = True).str.strip()
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
@@ -1348,7 +1358,7 @@ def dados_GO():
 	
 
 	print(dados)
-	# z = input("")
+	print(dados.info())
 
 
 
@@ -1358,7 +1368,7 @@ def dados_GO():
 	dados.to_excel(".\planilhas filtradas\Dados_GO.xlsx", index = False)
 
 
-dados_GO()
+
 
 
 #################################                  4 - MA               ##################################################
@@ -1372,9 +1382,9 @@ def dados_MA():
 
 	# print(dados ["Data do Movimento"])
 
-	dados["Data Abertura"] = dados["Data Abertura"].astype(str).str.split(" ", n=1, expand = True)[0]
-	dados["Data do Movimento"] = dados["Data do Movimento"].astype(str).str.split(" ", n=1, expand = True)[0]
-	ano = dados["Data Abertura"].astype(str).str.split("-", n=1, expand = True)[0]
+	# dados["Data Abertura"] = dados["Data Abertura"].astype(str).str.split(" ", n=1, expand = True)[0]
+	# dados["Data do Movimento"] = dados["Data do Movimento"].astype(str).str.split(" ", n=1, expand = True)[0]
+	ano = dados["Número Único"].astype(str).str.split(".", expand = True)[1]
 
 	dados["Ano"] = ano.astype(int)
 	dados["Estado"] = "MA"
@@ -1391,16 +1401,6 @@ def dados_MA():
 
 	dados["Planilha"] = "TJMA_1"
 
-
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 
 	###################################
@@ -1420,13 +1420,6 @@ def dados_MA():
 
 	dados_2["Competência"] = "Estadual"
 
-	dados_2['Data da Distribuição'] = pd.to_datetime(dados_2['Data da Distribuição'])
-
-	dados_2['Data da Distribuição'] = dados_2['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	dados_2['Data da Sentença'] = pd.to_datetime(dados_2['Data da Sentença'])
-
-	dados_2['Data da Sentença'] = dados_2['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 
 
@@ -1447,13 +1440,6 @@ def dados_MA():
 
 	dados_3["Competência"] = "Estadual"
 
-	dados_3['Data da Distribuição'] = pd.to_datetime(dados_3['Data da Distribuição'])
-
-	dados_3['Data da Distribuição'] = dados_3['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	dados_3['Data da Sentença'] = pd.to_datetime(dados_3['Data da Sentença'])
-
-	dados_3['Data da Sentença'] = dados_3['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 
 	###############################################################
@@ -1473,13 +1459,6 @@ def dados_MA():
 
 	dados_4["Competência"] = "Estadual"
 
-	dados_4['Data da Distribuição'] = pd.to_datetime(dados_4['Data da Distribuição'])
-
-	dados_4['Data da Distribuição'] = dados_4['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	dados_4['Data da Sentença'] = pd.to_datetime(dados_4['Data da Sentença'])
-
-	dados_4['Data da Sentença'] = dados_4['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 
 
@@ -1511,22 +1490,26 @@ def dados_MA():
 
 	dados["Comarca"] = dados["Comarca"].replace(to_replace = r"(?i)Ju(í|i)zo d(a|o)|-.+", value = '', regex = True).str.strip()
 
-	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
-	# print(dados)
-	# z = input("")
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
 	print(dados)
+	print(dados.info())
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_MA.xlsx", index = False)
 
-dados_MA()
+
 
 
 
@@ -1546,13 +1529,15 @@ def dados_MG():
 
 	dados = pd.concat([dados_1,dados_2])
 
-	dados["Data da Distribuição"] = dados["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]
-	dados["Data Sentença"] = dados["Data Sentença"].astype(str).str.split(" ", n=1, expand = True)[0]
-	
-
 
 	dados.rename(columns={'Nº do Feito Único': 'Número do Processo','Origem dos Dados': 'Origem', 'Data Sentença': 'Data da Sentença'}, 
 		inplace = True)
+
+
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
 
 
 	dados['Número do Processo'] = dados['Número do Processo'].astype(str).str.replace("-","")
@@ -1581,16 +1566,6 @@ def dados_MG():
 
 	dados["Competência"] = "Estadual"
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
@@ -1598,6 +1573,7 @@ def dados_MG():
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 	
 	print(dados)
+	print(dados.info())
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -1605,7 +1581,7 @@ def dados_MG():
 	dados.to_excel(".\planilhas filtradas\Dados_MG.xlsx", index = False)
 
 
-dados_MG()
+
 
 
 
@@ -1620,9 +1596,6 @@ dados_MG()
 
 #################################                 7 - MT               ##################################################
 
-''' dúvidas: Origem dos dados do MT? Quais são do SEEU? sabemos?? '''
-
-
 
 def dados_MT():
 
@@ -1630,9 +1603,19 @@ def dados_MT():
 
 	dados = planilha
 
-	dados["Data_Inicio_Tramite"] = dados["Data_Inicio_Tramite"].astype(str).str.split(" ", n=1, expand = True)[0]
-	dados["DataDecisao"] = dados["DataDecisao"].astype(str).str.split(" ", n=1, expand = True)[0]
-	ano = dados["Data_Inicio_Tramite"].astype(str).str.split("-", n=1, expand = True)[0]
+
+	dados.rename(columns={'NumeroUnico': 'Número do Processo', 'DataDecisao': 'Data da Sentença','Lotacao':'Vara',
+		'Data_Inicio_Tramite':'Data da Distribuição'}, 
+		inplace = True)
+	
+
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+
+	ano = dados['Número do Processo'].astype(str).str.split(".", expand = True)[1]
 
 	dados["Ano"] = ano.astype(int)
 	dados["Estado"] = "MT"
@@ -1640,22 +1623,10 @@ def dados_MT():
 	df_filter = dados ["Ano"] >= 2017
 	dados = dados[df_filter]
 
-	dados.rename(columns={'NumeroUnico': 'Número do Processo', 'DataDecisao': 'Data da Sentença','Lotacao':'Vara',
-		'Data_Inicio_Tramite':'Data da Distribuição'}, 
-		inplace = True)
-
+	
 	dados["Competência"] = "Estadual"
-	# print(dados)
+	
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 	dados["Planilha"] = 'TJMT_1'
 
@@ -1667,6 +1638,7 @@ def dados_MT():
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
 	print(dados)
+	print(dados.info())
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -1674,27 +1646,39 @@ def dados_MT():
 	dados.to_excel(".\planilhas filtradas\Dados_MT.xlsx", index = False)
 
 
-dados_MT()
+
 
 
 #################################                 8 - PA               ##################################################
 
-''' dúvidas: Origem dos dados do PA? Quais são do SEEU? sabemos?? '''
-
-
 def dados_PA():
 
-	planilha = pd.read_excel(".\Planilhas tribunais\TJPA_1.xlsx", engine ='openpyxl')
+	planilha = pd.read_excel(".\Planilhas tribunais\TJPA_1.xlsx", engine ='openpyxl', sheet_name = 'Select select')
 
 	dados = planilha
+
+	# print(dados)
+	# z= input("")
 
 	dados["DATA DISTRIBUIÇÃO"] = dados["DATA DISTRIBUIÇÃO"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/",'-')
 	dados["DATA EXTINÇÃO PUNIBILIDADE"] = dados["DATA EXTINÇÃO PUNIBILIDADE"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/",'-')
 
-	# print(dados["DATA DISTRIBUIÇÃO"])
-	# z= input("")
 
-	ano = dados["DATA DISTRIBUIÇÃO"].astype(str).str.split("-", n=2, expand = True)[2]
+	dados.rename(columns={'PROCESSO': 'Número do Processo', 'DATA EXTINÇÃO PUNIBILIDADE': 'Data da Sentença','UNIDADE SENTENÇA':'Vara',
+		'DATA DISTRIBUIÇÃO':'Data da Distribuição', 'COMARCA': 'Comarca'}, 
+		inplace = True)
+
+
+	fim = dados["Número do Processo"].astype(str).str[-4:]
+	est = dados["Número do Processo"].astype(str).str[-6:-4]
+	just = dados["Número do Processo"].astype(str).str[-7]
+	ano_aj = dados["Número do Processo"].astype(str).str[-11:-7]
+	cod = dados["Número do Processo"].astype(str).str[-13:-11]
+	rest = dados["Número do Processo"].astype(str).str[:-13]
+
+	dados["Número do Processo"] = rest+"-"+cod+"."+ano_aj+"."+just+"."+est+"."+fim
+
+	ano = dados['Número do Processo'].astype(str).str.split(".", expand = True)[1]
 
 	dados["Ano"] = ano.astype(int)
 	dados["Estado"] = "PA"
@@ -1702,35 +1686,26 @@ def dados_PA():
 	df_filter = dados ["Ano"] >= 2017
 	dados = dados[df_filter]
 
-	dados["PROCESSO"] = dados["PROCESSO"].astype(str)
-
-	dados.rename(columns={'PROCESSO': 'Número do Processo', 'DATA EXTINÇÃO PUNIBILIDADE': 'Data da Sentença','UNIDADE SENTENÇA':'Vara',
-		'DATA DISTRIBUIÇÃO':'Data da Distribuição', 'COMARCA': 'Comarca'}, 
-		inplace = True)
-
-
+	
 	dados["Competência"] = "Estadual"
-	# print(dados)
-
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
 
 	dados["Planilha"] = "TJPA_1"
 
 	dados["Origem"] = None
+
+
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
 	print(dados)
+	print(dados.info())
 	
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -1739,7 +1714,7 @@ def dados_PA():
 	dados.to_excel(".\planilhas filtradas\Dados_PA.xlsx", index = False)
 
 
-dados_PA()
+
 
 
 #################################                 9 - PB              ##################################################
@@ -1801,10 +1776,6 @@ def dados_PB():
 	dados["Data da Sentença"] = dados["Data da Sentença"].astype(str).str.replace("/","-")
 
 
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
 	dados["Planilha"] = "TJPB_1"
 
 	ano = dados["Número do Processo"].astype(str).str.split(".", expand = True)[1]
@@ -1819,6 +1790,7 @@ def dados_PB():
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
 	print(dados)
+	print(dados.info())
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -1826,7 +1798,7 @@ def dados_PB():
 	dados.to_excel(".\planilhas filtradas\Dados_PB.xlsx", index = False)
 
 
-dados_PB()
+
 
 #################################                 10 - PE              ##################################################
 
@@ -1849,18 +1821,6 @@ def dados_PE():
 	dados["Planilha"] = 'TJPE_1'
 
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
-
-
 	dados["Comarca"] = dados["Vara"].astype(str).str.split("\sDA\s", expand = True)[1]
 
 
@@ -1868,12 +1828,15 @@ def dados_PE():
 
 	# print(dados["Comarca"])
 	
-	ano_aj = dados ["Data da Distribuição"].astype(str).str.split("-",expand = True)[2].str.strip()
+	ano_aj = dados ["Número do Processo"].astype(str).str.split(".",expand = True)[1].str.strip()
 
 	ano_dados = ano_aj.astype(int)
 	dados["Ano"] = ano_dados
 	df_filter = dados ["Ano"] >= 2017
 	dados = dados[df_filter]
+
+	dados["Data da Distribuição"] = dados["Data da Distribuição"].astype(str).str.replace("/","-")
+	dados["Data da Sentença"] = dados["Data da Sentença"].astype(str).str.replace("/","-").str.split(" ", n=1, expand = True)[0]
 
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado", "Competência", 'Planilha']]
@@ -1882,7 +1845,7 @@ def dados_PE():
 	
 
 	print(dados)
-	# z = input("")
+	print(dados.info())
 
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -1891,7 +1854,7 @@ def dados_PE():
 	dados.to_excel(".\planilhas filtradas\Dados_PE.xlsx", index = False)
 
 
-dados_PE()
+
 
 #################################                 10 - PI              ##################################################
 
@@ -1927,13 +1890,6 @@ def dados_PI():
 
 	dados["Competência"] = "Estadual"
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 
 
@@ -1968,16 +1924,6 @@ def dados_PI():
 
 	dados_2["Competência"] = "Estadual"
 
-	dados_2['Data da Distribuição'] = pd.to_datetime(dados_2['Data da Distribuição'])
-
-	dados_2['Data da Distribuição'] = dados_2['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados_2['Data da Sentença'] = pd.to_datetime(dados_2['Data da Sentença'])
-
-	dados_2['Data da Sentença'] = dados_2['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
 
 
 	dados = pd.concat([dados,dados_2])
@@ -1989,7 +1935,14 @@ def dados_PI():
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+
 	print(dados)
+	print(dados.info())
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -1997,7 +1950,7 @@ def dados_PI():
 	dados.to_excel(".\planilhas filtradas\Dados_PI.xlsx", index = False)
 
 
-dados_PI()
+
 
 
 #################################                 11 - PR              ##################################################
@@ -2088,31 +2041,29 @@ def dados_PR():
 
 	dados["Competência"] = "Estadual"
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
-
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado", "Competência", 'Planilha']]
+
+
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
 
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
 
 	print(dados)
-	# z = input("")
+	print(dados.info())
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_PR.xlsx", index = False)
 
-dados_PR()
+
 
 #########################################    RN  #########################################################################
 
@@ -2125,8 +2076,8 @@ def dados_RN():
 	'DATA DISTRIBUIÇÃO':'Data da Distribuição', 'MOVIMENTO EXTINÇÃO PUNIBILIDADE DATA':"Data da Sentença"}, 
 	inplace = True)
 
-	dados["Data da Distribuição"] = dados["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]
-	dados["Data da Sentença"] = dados["Data da Sentença"].astype(str).str.split(" ", n=1, expand = True)[0]
+	dados["Data da Distribuição"] = dados["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
+	dados["Data da Sentença"] = dados["Data da Sentença"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
 
 
 	dados['Número do Processo'] = dados['Número do Processo'].astype(str).str.replace("-","")
@@ -2157,14 +2108,6 @@ def dados_RN():
 
 	dados["Competência"] = "Estadual"
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
 
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado", "Competência", 'Planilha']]
@@ -2173,10 +2116,20 @@ def dados_RN():
 	dados["Comarca"] = dados["Comarca"].replace(to_replace = r"TJRN - Comarca de|TJRN -  Comarca de", value = '', regex = True).str.strip()
 	dados["Vara"] = dados["Vara"].replace(to_replace = r"TJRN -|-.+", value = '', regex = True).str.strip()
 
-	print(dados["Vara"])
-	# z = input("")
-
+	
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+
+
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+
+	print(dados)
+	print(dados.info())
+
+
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -2184,7 +2137,7 @@ def dados_RN():
 	dados.to_excel(".\planilhas filtradas\Dados_RN.xlsx", index = False)
 
 
-dados_RN()
+
 
 #################################                 12 - RJ             ##################################################
 
@@ -2204,8 +2157,6 @@ def dados_RO():
 
 	dados = planilha
 
-	dados["Data de Distribuição"] = dados["Data de Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]
-	dados["Data do movimento"] = dados["Data do movimento"].astype(str).str.split(" ", n=1, expand = True)[0]
 	ano = dados["Número Processo"].astype(str).str.split(".", expand = True)[1]
 
 	dados["Ano"] = ano.astype(int)
@@ -2225,15 +2176,6 @@ def dados_RO():
 	# print(dados)
 	dados["Competência"] = "Estadual"
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 	dados["Planilha"] = "TJRO_1"
 
@@ -2251,11 +2193,9 @@ def dados_RO():
 	'DATA DISTRIBUICAO':'Data da Distribuição', 'DATA MOVIMENTO EXTINCAO':"Data da Sentença"}, 
 	inplace = True)
 
-	dados_2["Data da Distribuição"] = dados_2["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]
-	dados_2["Data da Sentença"] = dados_2["Data da Sentença"].astype(str).str.split(" ", n=1, expand = True)[0]
+	
 
-
-	indexes = dados_2[ dados_2['Número do Processo'] == 'SEGREDO DE JUSTIÇA' ].index
+	indexes = dados_2[dados_2['Número do Processo'] == 'SEGREDO DE JUSTIÇA' ].index
 	dados_2.drop(indexes, inplace=True)
 
 
@@ -2273,12 +2213,6 @@ def dados_RO():
 
 	dados_2["Competência"] = "Estadual"
 
-	dados_2['Data da Distribuição'] = pd.to_datetime(dados_2['Data da Distribuição'])
-	dados_2['Data da Distribuição'] = dados_2['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	dados_2['Data da Sentença'] = pd.to_datetime(dados_2['Data da Sentença'])
-
-	dados_2['Data da Sentença'] = dados_2['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 	dados_2["Origem"] = None
 
@@ -2315,7 +2249,11 @@ def dados_RO():
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
-	print(dados)
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado", "Competência", 'Planilha']]
 
@@ -2324,7 +2262,7 @@ def dados_RO():
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_RO.xlsx", index = False)
 
-dados_RO()
+
 
 
 #################################                 14 - RR             ##################################################
@@ -2341,14 +2279,12 @@ def dados_RR():
 	'DISTRIBUIÇÃO':'Data da Distribuição', 'DATA DA SENTENÇA':"Data da Sentença", 'SISTEMA':"Origem"}, 
 	inplace = True)
 
-	dados_2["Data da Distribuição"] = dados_2["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]
-	dados_2["Data da Sentença"] = dados_2["Data da Sentença"].astype(str).str.split(" ", n=1, expand = True)[0]
 
 
 	ano_2 = dados_2["Número do Processo"].astype(str).str.split(".", expand = True)[1]
 
 
-	dados_2["Planilha"] = 'TJRN_1'
+	dados_2["Planilha"] = 'TJRR_1'
 
 	dados_2["Ano"] = ano_2.astype(int)
 	dados_2["Estado"] = "RR"
@@ -2359,19 +2295,21 @@ def dados_RR():
 
 	dados_2["Competência"] = "Estadual"
 
-	dados_2['Data da Distribuição'] = pd.to_datetime(dados_2['Data da Distribuição'])
-	dados_2['Data da Distribuição'] = dados_2['Data da Distribuição'].dt.strftime('%d-%m-%Y')
 
-	dados_2['Data da Sentença'] = pd.to_datetime(dados_2['Data da Sentença'])
-
-	dados_2['Data da Sentença'] = dados_2['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 	dados = dados_2[["Número do Processo", "Comarca", "Vara", "Data da Distribuição","Data da Sentença", "Ano", "Estado", "Competência", 'Planilha']]
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+
+
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
 	
 	print(dados)
-	# z= input("")
+	print(dados.info())
 
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -2379,7 +2317,7 @@ def dados_RR():
 	Path(path).mkdir(parents=True, exist_ok=True)
 	dados.to_excel(".\planilhas filtradas\Dados_RR.xlsx", index = False)
 
-dados_RR()
+
 
 
 #################################                 15 - RS             ##################################################
@@ -2432,8 +2370,15 @@ def dados_SE():
 
 	df_se.drop(columns=["NADA",'NADA_2'], inplace = True)
 
-	
-	df_se.loc[df_se.Comarca == "", "Comarca"] = df_se["Vara"].astype(str).str.split("\sde\s|\sda\s", expand = True)[1]
+
+	df_se['Comarca'] = df_se['Comarca'].str.strip()
+
+	df_se.loc[df_se['Comarca'].str.contains("Vara", case= False) == True , "Vara"] = df_se["Comarca"]
+	df_se.loc[df_se['Comarca'].str.contains("Vara", case= False) == True , "Comarca"] = ''
+
+	df_se.loc[(df_se['Vara'].str.contains("Vara de Execução", case= False) == False) &  (df_se['Comarca'] == ""), "Comarca"] = df_se["Vara"].astype(str).str.split("\sde\s",expand = True)[1]
+
+	df_se["Vara"] = df_se["Vara"].astype(str).str.strip()
 
 	df_se["Origem"] = "SEEU"
 	df_se["Planilha"] = "TJSE_1"
@@ -2481,8 +2426,6 @@ def dados_SE():
 	df_se_2.drop(columns=["NADA",'NADA_2'], inplace = True)
 
 	
-	df_se_2.loc[df_se_2.Comarca == "", "Comarca"] = df_se_2["Vara"].astype(str).str.split("\sde\s|\sda\s", expand = True)[1]
-
 	df_se_2["Origem"] = "SEEU"
 	df_se_2["Planilha"] = "TJSE_2"
 
@@ -2516,8 +2459,13 @@ def dados_SE():
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
 	dados.drop_duplicates(subset="Número do Processo", inplace= True)
+
+
+	dados["Data da Distribuição"] = dados["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
+	dados["Data da Sentença"] = dados["Data da Sentença"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
 	
 	print(dados)
+	print(dados.info())
 
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -2527,7 +2475,7 @@ def dados_SE():
 
 
 
-dados_SE()
+
 #################################                 16 - SC             ##################################################
 
 # não mandou os números dos processos
@@ -2549,17 +2497,19 @@ def dados_SP():
 	"Data da Extinção da Punibilidade"]]
 
 
-	dados["Data Distribuição"] = dados["Data Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]
-	dados["Data da Extinção da Punibilidade"] = dados["Data da Extinção da Punibilidade"].astype(str).str.split(" ", n=1, expand = True)[0]
-	ano = dados["Data Distribuição"].astype(str).str.split("-", n=1, expand = True)[0]
+	# dados["Data Distribuição"] = dados["Data Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]
+	# dados["Data da Extinção da Punibilidade"] = dados["Data da Extinção da Punibilidade"].astype(str).str.split(" ", n=1, expand = True)[0]
+	
 
-	dados["Ano"] = ano.astype(int)
-	dados["Estado"] = "SP"
+	# ano = dados["Número do Processo"].astype(str).str.split(".", expand = True)[1]
 
-	df_filter = dados ["Ano"] >= 2017
-	dados = dados[df_filter]
+	# dados["Ano"] = ano.astype(int)
+	# dados["Estado"] = "SP"
 
-	dados["Origem"] = "SAJ"
+	# df_filter = dados ["Ano"] >= 2017
+	# dados = dados[df_filter]
+
+	# dados["Origem"] = "SAJ"
 
 
 	dados.rename(columns={'Número do Processo': 'Número do Processo', 'Data da Extinção da Punibilidade': 'Data da Sentença','Descrição da Vara':'Vara',
@@ -2569,15 +2519,6 @@ def dados_SP():
 
 	dados["Competência"] = "Estadual"
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 	dados["Planilha"] = "TJSP_1"
 
@@ -2601,15 +2542,7 @@ def dados_SP():
 
 	planilha_2["Competência"] = "Estadual"
 
-	planilha_2['Data da Distribuição'] = pd.to_datetime(planilha_2['Data da Distribuição'])
 
-	planilha_2['Data da Distribuição'] = planilha_2['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	planilha_2['Data da Sentença'] = pd.to_datetime(planilha_2['Data da Sentença'])
-
-	planilha_2['Data da Sentença'] = planilha_2['Data da Sentença'].dt.strftime('%d-%m-%Y')
 	planilha_2["Estado"] = 'SP'
 
 	####################################
@@ -2632,15 +2565,7 @@ def dados_SP():
 
 	planilha_3["Competência"] = "Estadual"
 
-	planilha_3['Data da Distribuição'] = pd.to_datetime(planilha_3['Data da Distribuição'])
 
-	planilha_3['Data da Distribuição'] = planilha_3['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	planilha_3['Data da Sentença'] = pd.to_datetime(planilha_3['Data da Sentença'])
-
-	planilha_3['Data da Sentença'] = planilha_3['Data da Sentença'].dt.strftime('%d-%m-%Y')
 	planilha_3["Estado"] = 'SP'
 
 
@@ -2678,7 +2603,17 @@ def dados_SP():
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado", "Competência","Planilha"]]
 
+
+
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+
+	
 	print(dados)
+	print(dados.info())
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -2686,7 +2621,7 @@ def dados_SP():
 	dados.to_excel(".\planilhas filtradas\Dados_SP.xlsx", index = False)
 
 
-dados_SP()
+
 
 
 #################################                 18 - TO             ##################################################
@@ -2770,6 +2705,29 @@ def dados_TO():
 	planilha_2["Estado"] = 'TO'
 
 	planilha_2["Competência"] = "Estadual"
+
+
+	# x = planilha_2["Data da Sentença"]
+
+	planilha_2["Data da Sentença"] = pd.to_datetime(planilha_2["Data da Sentença"])
+	planilha_2["Data da Sentença"] = planilha_2["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+	# y = planilha_2["Data da Sentença"]
+
+	# g = x.astype(str).str[8:10]
+	# i = y.astype(str).str[:2]
+
+	# h = pd.concat([x,y,g,i], axis =1, keys=["x","y","g","i"])
+
+	# h["Comparação"] = np.where(h['g'] == h['i'], "Igual","Diferente")
+
+	# h = h.dropna()
+
+	# print(h)
+	# print(h["Comparação"].value_counts())
+
+	# z = input("pronto!")
+
 	
 
 	########################
@@ -2785,6 +2743,9 @@ def dados_TO():
 	 inplace = True)
 
 
+	planilha_3["Data da Distribuição"] = planilha_3["Data da Distribuição"].astype(str).str.replace("/","-")
+	planilha_3["Data da Sentença"] = planilha_3["Data da Sentença"].astype(str).str.replace("/","-")
+
 	planilha_3["Planilha"] = "TJTO_3_1"
 
 
@@ -2793,15 +2754,7 @@ def dados_TO():
 
 	planilha_3["Competência"] = "Estadual"
 
-	planilha_3['Data da Distribuição'] = pd.to_datetime(planilha_3['Data da Distribuição'])
 
-	planilha_3['Data da Distribuição'] = planilha_3['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	planilha_3['Data da Sentença'] = pd.to_datetime(planilha_3['Data da Sentença'])
-
-	planilha_3['Data da Sentença'] = planilha_3['Data da Sentença'].dt.strftime('%d-%m-%Y')
 	planilha_3["Estado"] = 'TO'
 
 
@@ -2813,6 +2766,7 @@ def dados_TO():
 
 	planilha_4.rename(columns={'Processo': 'Número do Processo'},
 	 inplace = True)
+
 
 
 	planilha_4["Planilha"] = "TJTO_3_2"
@@ -2845,6 +2799,9 @@ def dados_TO():
 	 inplace = True)
 
 
+	planilha_5["Data da Distribuição"] = planilha_5["Data da Distribuição"].astype(str).str.replace("/","-")
+	planilha_5["Data da Sentença"] = planilha_5["Data da Sentença"].astype(str).str.replace("/","-")
+
 	planilha_5["Planilha"] = "TJTO_4"
 
 
@@ -2853,15 +2810,7 @@ def dados_TO():
 
 	planilha_5["Competência"] = "Estadual"
 
-	planilha_5['Data da Distribuição'] = pd.to_datetime(planilha_5['Data da Distribuição'])
-
-	planilha_5['Data da Distribuição'] = planilha_5['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	planilha_5['Data da Sentença'] = pd.to_datetime(planilha_5['Data da Sentença'])
-
-	planilha_5['Data da Sentença'] = planilha_5['Data da Sentença'].dt.strftime('%d-%m-%Y')
+	
 	planilha_5["Estado"] = 'TO'
 
 
@@ -2899,9 +2848,77 @@ def dados_TO():
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+
+
+	############# ajuste nos pedaços
+
+	parte_certa = dados.iloc[:1547,:]
+
+	# print(parte_certa)
+
+	# z= input("")
+
+	### fazer o split pelo espaço na dt distr e dt sentença(fazer inversão)
+	parte_ajus_dist_1 = dados.iloc[1547:1553,:]
+
+	parte_ajus_dist_1["Data da Sentença"] = parte_ajus_dist_1["Data da Sentença"].astype(str).str.split(" ", n=1, expand = True)[0]
+	parte_ajus_dist_1["Data da Distribuição"] = parte_ajus_dist_1["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]  
+
+
+
+	parte_ajus_dist_1["Data da Sentença"] = pd.to_datetime(parte_ajus_dist_1["Data da Sentença"])
+	parte_ajus_dist_1["Data da Sentença"] = parte_ajus_dist_1["Data da Sentença"].dt.strftime("%d-%m-%Y") 
+
+
+
+	## fazer o split e inverter ambas as datas
+	parte_ajus_dist_2 = dados.iloc[1553:1559,:]
+
+
+	parte_ajus_dist_2["Data da Sentença"] = parte_ajus_dist_2["Data da Sentença"].astype(str).str.split(" ", n=1, expand = True)[0]
+	parte_ajus_dist_2["Data da Distribuição"] = parte_ajus_dist_2["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]  
+
+
+	parte_ajus_dist_2["Data da Sentença"] = pd.to_datetime(parte_ajus_dist_2["Data da Sentença"])
+	parte_ajus_dist_2["Data da Sentença"] = parte_ajus_dist_2["Data da Sentença"].dt.strftime("%d-%m-%Y") 
+	parte_ajus_dist_2["Data da Distribuição"] = pd.to_datetime(parte_ajus_dist_2["Data da Distribuição"])
+	parte_ajus_dist_2["Data da Distribuição"] = parte_ajus_dist_2["Data da Distribuição"].dt.strftime("%d-%m-%Y") 
+
+
+	## fazer o split pelo espaço na dt distr e dt sentença(fazer inversão)
+
+
+	parte_ajus_dist_3 = dados.iloc[1569:1579,:]
+	
+	parte_ajus_dist_3["Data da Sentença"] = parte_ajus_dist_3["Data da Sentença"].astype(str).str.split(" ", n=1, expand = True)[0]
+	parte_ajus_dist_3["Data da Distribuição"] = parte_ajus_dist_3["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]  
 	
 
+	parte_ajus_dist_3["Data da Sentença"] = pd.to_datetime(parte_ajus_dist_3["Data da Sentença"])
+	parte_ajus_dist_3["Data da Sentença"] = parte_ajus_dist_3["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+
+	## fazer o split e inverter ambas as datas
+
+	parte_ajus_dist_4 = dados.iloc[1579:,:]
+
+	# print(parte_ajus_dist_4)
+
+	# z= input("")
+	parte_ajus_dist_4["Data da Sentença"] = parte_ajus_dist_4["Data da Sentença"].astype(str).str.split(" ", n=1, expand = True)[0]
+	parte_ajus_dist_4["Data da Distribuição"] = parte_ajus_dist_4["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]  
+
+	parte_ajus_dist_4["Data da Sentença"] = pd.to_datetime(parte_ajus_dist_4["Data da Sentença"])
+	parte_ajus_dist_4["Data da Sentença"] = parte_ajus_dist_4["Data da Sentença"].dt.strftime("%d-%m-%Y") 
+	parte_ajus_dist_4["Data da Distribuição"] = pd.to_datetime(parte_ajus_dist_4["Data da Distribuição"])
+	parte_ajus_dist_4["Data da Distribuição"] = parte_ajus_dist_4["Data da Distribuição"].dt.strftime("%d-%m-%Y") 
+
+
+
+	dados = pd.concat([parte_certa,parte_ajus_dist_1,parte_ajus_dist_2,parte_ajus_dist_3,parte_ajus_dist_4])
+
 	print(dados)
+	print(dados.info())
 
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -2910,7 +2927,7 @@ def dados_TO():
 	dados.to_excel(".\planilhas filtradas\Dados_TO.xlsx", index = False)
 
 
-dados_TO()
+
 
 
 
@@ -2957,13 +2974,6 @@ def dados_TRF2():
 
 	dados["Competência"] = "Federal"
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 	dados["Origem"] = None
 
@@ -2989,10 +2999,17 @@ def dados_TRF2():
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
-	print(dados)
-	# z = input("")
+
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+	
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
+	print(dados)
+	print(dados.info())
 
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -3002,7 +3019,7 @@ def dados_TRF2():
 
 
 
-dados_TRF2()
+
 
 
 #################################                 20 - TRF 3            ##################################################
@@ -3081,10 +3098,6 @@ def dados_TRF3():
 	planilha_3["Competência"] = "Federal"
 
 
-	planilha_3['Data da Sentença'] = pd.to_datetime(planilha_3['Data da Sentença'])
-
-	planilha_3['Data da Sentença'] = planilha_3['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
 
 	planilha_3["Comarca"] = planilha_3["Comarca"].str.strip()
 
@@ -3112,13 +3125,6 @@ def dados_TRF3():
 
 	dados_4["Origem"] = "DW"
 
-	dados_4['Data da Distribuição'] = pd.to_datetime(dados_4['Data da Distribuição'])
-
-	dados_4['Data da Distribuição'] = dados_4['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	dados_4['Data da Sentença'] = pd.to_datetime(dados_4['Data da Sentença'])
-
-	dados_4['Data da Sentença'] = dados_4['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 
 	########################################################################
@@ -3129,13 +3135,8 @@ def dados_TRF3():
 
 	dados["Competência"] = "Federal"
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados["Data da Distribuição"] = np.where(dados["Data da Distribuição"].astype(str).str.strip() == 'nan', "",dados["Data da Distribuição"])
 
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
 
 
 	dados['Número do Processo'] = dados['Número do Processo'].astype(str).str.replace("-","")
@@ -3163,10 +3164,29 @@ def dados_TRF3():
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
-	# z = input("")
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
+
+	dados["Data da Distribuição"] = dados["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
+	dados["Data da Sentença"] = dados["Data da Sentença"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
+
+
+	parte_ajus_dist_1 = dados.iloc[:140,:]
+
+
+	parte_ajus_dist_1["Data da Distribuição"] = pd.to_datetime(parte_ajus_dist_1["Data da Distribuição"])
+	parte_ajus_dist_1["Data da Distribuição"] = parte_ajus_dist_1["Data da Distribuição"].dt.strftime("%d-%m-%Y")
+	parte_ajus_dist_1["Data da Sentença"] = pd.to_datetime(parte_ajus_dist_1["Data da Sentença"])
+	parte_ajus_dist_1["Data da Sentença"] = parte_ajus_dist_1["Data da Sentença"].dt.strftime("%d-%m-%Y") 
+	
+
+
+	parte_certa = dados.iloc[140:,:]
+
+	dados = pd.concat([parte_ajus_dist_1,parte_certa])
+
 	print(dados)
+	print(dados.info())
 
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -3175,7 +3195,7 @@ def dados_TRF3():
 	dados.to_excel(".\planilhas filtradas\Dados_TRF3.xlsx", index = False)
 
 
-dados_TRF3()
+
 
 
 
@@ -3246,16 +3266,6 @@ def dados_TRF4():
 	dados = dados[df_filter]
 
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	# print(dados['Data da Distribuição'])
-
-	dados['Data da Sentença'] = pd.to_datetime(dados['Data da Sentença'])
-
-	dados['Data da Sentença'] = dados['Data da Sentença'].dt.strftime('%d-%m-%Y')
-
 	dados["Tribunal"] = "TRF4"
 
 	dados["Planilha"] = "TRF_4"
@@ -3265,7 +3275,16 @@ def dados_TRF4():
 
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
+
+
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
+	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+
 	print(dados)
+	print(dados.info())
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
 	path = dir_path + f'\planilhas filtradas'
@@ -3274,7 +3293,7 @@ def dados_TRF4():
 
 
 
-dados_TRF4()
+
 
 
 ####################################################################################################################################################
@@ -3298,13 +3317,18 @@ def dados_TRF5():
 
 	dados["Competência"] = "Federal"
 
-	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
-
-	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
 	dados['Data da Sentença'] = None
 	
 	dados['Comarca'] = None
+
+	dados["Data da Distribuição"] = dados["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0]
+
+
+	dados['Data da Distribuição'] = pd.to_datetime(dados['Data da Distribuição'])
+	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+
+
+
 
 	#################################################
 
@@ -3327,15 +3351,11 @@ def dados_TRF5():
 
 	dados_2["Competência"] = "Federal"
 
-	dados_2['Data da Distribuição'] = pd.to_datetime(dados_2['Data da Distribuição'])
-
-	dados_2['Data da Distribuição'] = dados_2['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	dados_2['Data da Sentença'] = pd.to_datetime(dados_2['Data da Sentença'])
-
-	dados_2['Data da Sentença'] = dados_2['Data da Sentença'].dt.strftime('%d-%m-%Y')
 	
 	dados_2['Comarca'] = None
+
+	dados_2["Data da Distribuição"] = dados_2["Data da Distribuição"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
+	dados_2["Data da Sentença"] = dados_2["Data da Sentença"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/","-")
 
 
 	######################
@@ -3358,13 +3378,6 @@ def dados_TRF5():
 
 	dados_3["Competência"] = "Federal"
 
-	dados_3['Data da Distribuição'] = pd.to_datetime(dados_3['Data da Distribuição'])
-
-	dados_3['Data da Distribuição'] = dados_3['Data da Distribuição'].dt.strftime('%d-%m-%Y')
-
-	dados_3['Data da Sentença'] = pd.to_datetime(dados_3['Data da Sentença'])
-
-	dados_3['Data da Sentença'] = dados_3['Data da Sentença'].dt.strftime('%d-%m-%Y')
 	
 	dados_3['Comarca'] = None
 
@@ -3399,13 +3412,12 @@ def dados_TRF5():
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
-	# z = input("")
-
 	dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
 
 	dados["Tribunal"] = "TRF5"
 
 	print(dados)
+	print(dados.info())
 
 
 	dir_path = str(os.path.dirname(os.path.realpath(__file__)))
@@ -3414,7 +3426,7 @@ def dados_TRF5():
 	dados.to_excel(".\planilhas filtradas\Dados_TRF5.xlsx", index = False)
 
 
-dados_TRF5()
+
 
 
 ####################################################################################################################################################
@@ -3453,5 +3465,140 @@ def seleciona_amostra():
 
 	amostras.to_excel("Amostra_teste_2.xlsx", index = False)
 
-# seleciona_amostra()
 
+
+	#################################################################################################################################################
+
+
+def seleciona_amostra_quali():
+
+	planilha = pd.read_csv("Dados_unificados_JSON_LAI_SEEU.csv",  dtype = 'object')
+
+	tribunais = pd.DataFrame(planilha.groupby(["Tribunal"])["Tribunal"].count())
+	tribunais.columns = ["quantidade"]
+
+	tribunais = tribunais.reset_index()
+	# print(tribunais)
+	# a= input("")
+
+
+	selct = []
+	for item in tribunais["Tribunal"]:
+		if re.search('TJAC|TJAM|TJAP|TJBA|TJGO|TJPE|TJPR|TJRO|TJRR|TJSE|TJTO|TRF5',item):
+			selct.append(item)
+		else:
+			pass
+
+
+	manu = ['TJAC','TJAM','TJAP','TJBA']
+	vivi = ['TJGO','TJPE','TJPR','TJRO']
+	ana = ['TJRR','TJSE','TJTO','TRF5']		
+
+
+
+	dfs_manu = []
+	dfs_vivi = []
+	dfs_ana = []
+	for k in range(len(selct)):
+		df_filter = planilha["Tribunal"] == selct[k]
+		planilha_1 = planilha[df_filter]
+		amostra_trib = planilha_1.sample(194)
+		if selct[k] in manu:
+			dfs_manu.append(amostra_trib)
+			# print(amostra_trib)
+		elif selct[k] in vivi:
+			dfs_vivi.append(amostra_trib)
+			# print(amostra_trib)
+		elif selct[k] in ana:
+			dfs_ana.append(amostra_trib)
+			# print(amostra_trib)
+
+	# a= input("")		
+
+
+	dfs_manu_rw = []
+	dfs_vivi_rw = []
+	dfs_ana_rw = []		
+
+	for n in range(len(dfs_manu)):
+		# Ana recebe Manu
+
+		amostra_trib = dfs_manu[n].sample(6)
+		dfs_ana_rw.append(amostra_trib)
+
+		## vivi recebe Ana
+
+		amostra_trib = dfs_ana[n].sample(6)
+		dfs_vivi_rw.append(amostra_trib)
+
+
+		# manu recebe Vivi
+		amostra_trib = dfs_vivi[n].sample(6)
+		dfs_manu_rw.append(amostra_trib)
+
+
+
+	for z in range(len(dfs_manu)):
+		amostras = pd.concat([dfs_manu_rw[z],dfs_manu[z]])
+		amostras.to_excel("sorteio_0_amostra_"+str(z+1)+"_Manu.xlsx", index = False)
+		print("Manu")
+		print(amostras)
+		# print(amostras.info())
+		print(amostras.Tribunal.value_counts())
+		print("\n ******"*5)
+		amostras = pd.concat([dfs_vivi_rw[z],dfs_vivi[z]])
+		amostras.to_excel("sorteio_0_amostra_"+str(z+1)+"_Vivi.xlsx", index = False)
+		print("Vivi")
+		# print(amostras)
+		print(amostras.info())
+		print(amostras.Tribunal.value_counts())
+		print("\n ******"*5)
+		amostras = pd.concat([dfs_ana_rw[z],dfs_ana[z]])
+		amostras.to_excel("sorteio_0_amostra_"+str(z+1)+"_Ana.xlsx", index = False)
+		print("Ana")
+		# print(amostras)
+		print(amostras.info())
+		print(amostras.Tribunal.value_counts())
+		print("\n ******"*5)
+
+		a = input("")
+				
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+
+	# dados_AC()
+	# dados_AL()
+	# dados_AM()
+	# dados_AP()
+	# dados_BA()
+	# dados_CE()
+	# dados_ES()
+	# dados_GO()
+	# dados_MA()
+	# dados_MG()
+	# dados_MT()
+	# dados_PA()
+	# dados_PB()
+	# dados_PE()
+	# dados_PI()
+	# dados_PR()
+	# dados_RN()
+	# dados_RO()
+	# dados_RR()
+	# dados_SE()
+	# dados_SP()
+	# dados_TO()
+	# dados_TRF2()
+	# dados_TRF3()
+	# dados_TRF4()
+	# dados_TRF5()
+	# main()
+	# seleciona_amostra()
+	seleciona_amostra_quali()
