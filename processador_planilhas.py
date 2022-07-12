@@ -33,7 +33,7 @@ def main():
 	df_filter = todos_dados["Ano"] < 2022
 	todos_dados = todos_dados[df_filter]
 
-	todos_dados.to_excel("Dados_compilados_2.xlsx", index=False)
+	todos_dados.to_excel("Dados_compilados_3.xlsx", index=False)
 	print(todos_dados)
 	print(todos_dados.info())
 
@@ -1520,14 +1520,17 @@ def dados_MG():
 
 	planilha_1 = pd.read_excel(".\Planilhas tribunais\TJMG_1.xlsx", engine ='openpyxl')
 	planilha_2 = pd.read_excel(".\Planilhas tribunais\TJMG_2.xlsx", engine ='openpyxl')
+	planilha_3 = pd.read_excel(".\Planilhas tribunais\TJMG_3.xlsx", engine ='openpyxl')
 
 	dados_1 = planilha_1[["Nº do Feito Único","Comarca","Vara","Origem dos Dados","Data da Distribuição","Data Sentença"]]
 	dados_1["Planilha"] = "TJMG_1"
 	dados_2 = planilha_2[["Nº do Feito Único","Comarca","Vara","Origem dos Dados","Data da Distribuição","Data Sentença"]]
 	dados_2["Planilha"] = "TJMG_2"
+	dados_3 = planilha_3[["Nº do Feito Único","Comarca","Vara","Origem dos Dados","Data da Distribuição","Data Sentença"]]
+	dados_3["Planilha"] = "TJMG_3"
 	
 
-	dados = pd.concat([dados_1,dados_2])
+	dados = pd.concat([dados_1,dados_2,dados_3])
 
 
 	dados.rename(columns={'Nº do Feito Único': 'Número do Processo','Origem dos Dados': 'Origem', 'Data Sentença': 'Data da Sentença'}, 
@@ -1632,6 +1635,43 @@ def dados_MT():
 
 	dados["Origem"] = None
 
+	#################################################
+
+	dados_2 = pd.read_excel(".\Planilhas tribunais\TJMT_2.xlsx", engine ='openpyxl')
+
+
+	dados_2.rename(columns={'NumeroUnico': 'Número do Processo', 'DataExtincao': 'Data da Sentença','Lotacao':'Vara',
+		'DataDistribuicao':'Data da Distribuição'}, 
+		inplace = True)
+	
+
+	dados_2['Data da Distribuição'] = pd.to_datetime(dados_2['Data da Distribuição'])
+	dados_2['Data da Distribuição'] = dados_2['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados_2["Data da Sentença"] = pd.to_datetime(dados_2["Data da Sentença"])
+	dados_2["Data da Sentença"] = dados_2["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+
+	ano_2 = dados_2['Número do Processo'].astype(str).str.split(".", expand = True)[1]
+
+	dados_2["Ano"] = ano_2.astype(int)
+	dados_2["Estado"] = "MT"
+
+	df_filter_2 = dados_2["Ano"] >= 2017
+	dados_2 = dados_2[df_filter_2]
+
+	
+	dados_2["Competência"] = "Estadual"
+	
+
+	dados_2["Planilha"] = 'TJMT_2'
+
+	dados_2["Origem"] = None
+
+
+	##################################################
+
+	dados = pd.concat([dados,dados_2])
+
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
 
@@ -1698,6 +1738,58 @@ def dados_PA():
 	dados['Data da Distribuição'] = dados['Data da Distribuição'].dt.strftime("%d-%m-%Y")
 	dados["Data da Sentença"] = pd.to_datetime(dados["Data da Sentença"])
 	dados["Data da Sentença"] = dados["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+	##################################################
+
+	dados_2 = pd.read_excel(".\Planilhas tribunais\TJPA_2.xlsx", engine ='openpyxl')
+
+
+	# print(dados)
+	# z= input("")
+
+	dados_2["DATA DISTRIBUIÇÃO"] = dados_2["DATA_DISTRIBUICAO"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/",'-')
+	dados_2["DATA_DECISAO"] = dados_2["DATA_DECISAO"].astype(str).str.split(" ", n=1, expand = True)[0].str.replace("/",'-')
+
+
+	dados_2.rename(columns={'PROCESSO': 'Número do Processo', 'DATA_DECISAO': 'Data da Sentença','UNIDADE':'Vara',
+		'DATA DISTRIBUIÇÃO':'Data da Distribuição', 'COMARCA': 'Comarca'}, 
+		inplace = True)
+
+
+	fim = dados_2["Número do Processo"].astype(str).str[-4:]
+	est = dados_2["Número do Processo"].astype(str).str[-6:-4]
+	just = dados_2["Número do Processo"].astype(str).str[-7]
+	ano_aj = dados_2["Número do Processo"].astype(str).str[-11:-7]
+	cod = dados_2["Número do Processo"].astype(str).str[-13:-11]
+	rest = dados_2["Número do Processo"].astype(str).str[:-13]
+
+	dados_2["Número do Processo"] = rest+"-"+cod+"."+ano_aj+"."+just+"."+est+"."+fim
+
+	ano_2 = dados_2['Número do Processo'].astype(str).str.split(".", expand = True)[1]
+
+	dados_2["Ano"] = ano_2.astype(int)
+	dados_2["Estado"] = "PA"
+
+	df_filter_2 = dados_2 ["Ano"] >= 2017
+	dados_2 = dados_2[df_filter_2]
+
+	
+	dados_2["Competência"] = "Estadual"
+
+	dados_2["Planilha"] = "TJPA_2"
+
+	dados_2["Origem"] = None
+
+
+	dados_2['Data da Distribuição'] = pd.to_datetime(dados_2['Data da Distribuição'])
+	dados_2['Data da Distribuição'] = dados_2['Data da Distribuição'].dt.strftime("%d-%m-%Y")
+	dados_2["Data da Sentença"] = pd.to_datetime(dados_2["Data da Sentença"])
+	dados_2["Data da Sentença"] = dados_2["Data da Sentença"].dt.strftime("%d-%m-%Y")
+
+
+	#################################################
+
+	dados = pd.concat([dados,dados_2])
 
 
 	dados = dados[["Número do Processo", "Comarca", "Vara", "Origem", "Data da Distribuição","Data da Sentença", "Ano", "Estado","Competência","Planilha"]]
@@ -1924,9 +2016,47 @@ def dados_PI():
 
 	dados_2["Competência"] = "Estadual"
 
+	##########################################################################################
+
+	planilha_3 = pd.read_csv(".\Planilhas tribunais\TJPI_3.csv", sep =";")
+
+	dados_3 = planilha_3
+
+	# print(dados_3)
+	# z= input("")
 
 
-	dados = pd.concat([dados,dados_2])
+	dados_3["data_movimentacao"] = dados_3["data_movimentacao"].astype(str).str.split(" ", n=1, expand = True)[0].replace("/","-")
+	dados_3["data_distribuicao"] = dados_3["data_distribuicao"].astype(str).str.split(" ", n=1, expand = True)[0].replace("/","-")
+	
+	dados_3["Ano"] = dados_3["ano"].astype(int)
+	dados_3["Estado"] = "PI"
+
+	dados_3["Origem"] = None
+
+	df_filter = dados_3["Ano"] >= 2017
+	dados_3 = dados_3[df_filter]
+
+
+	dados_3["Planilha"] = 'TJPI_3'
+
+
+	dados_3.rename(columns={'numero_unico': 'Número do Processo', 'data_movimentacao': 'Data da Sentença','orgao_julgador_nome':'Vara',
+		'data_distribuicao':'Data da Distribuição'}, 
+		inplace = True)
+
+
+	dados_3.drop(columns =["movimento_descricao","ano"], inplace = True)
+
+	dados_3["Competência"] = "Estadual"
+
+
+
+	############################################################################################
+
+
+
+	dados = pd.concat([dados,dados_2,dados_3])
 
 	dados ["Comarca"] = dados["Vara"].astype(str).str.split("DE|de",expand = True)[1].str.strip()
 
@@ -3474,6 +3604,43 @@ def seleciona_amostra_quali():
 
 	planilha = pd.read_csv("Dados_unificados_JSON_LAI_SEEU.csv",  dtype = 'object')
 
+	# cruzar com os dados das demais planilhas
+	lista_planilhas_a_ler = glob.glob("./sorteio_0/*.xlsx")
+
+	dados_planilhas_lidas = []
+
+	todos_dados = pd.DataFrame()
+	for planilha_2 in lista_planilhas_a_ler:
+	#	print("Nome da planilha a ler: ", planilha)
+		dados_planilhas_lidas.append(pd.read_excel(planilha_2, dtype="object", engine ='openpyxl'))
+
+	todos_dados = todos_dados.append(dados_planilhas_lidas, ignore_index=True, sort=False)
+
+	todos_dados.drop_duplicates(subset = 'Número do Processo', inplace= True)
+	print(todos_dados)
+	# z = input("")	
+
+	print(len(planilha))
+
+	# dropar os dados das demais planilhas
+	cont = 0
+	lista_numeros = list(todos_dados["Número do Processo"])
+	for h in range(len(planilha["Número do Processo"])):
+		if planilha["Número do Processo"][h] not in lista_numeros:
+			pass
+		else:
+			planilha.drop([h], inplace = True)
+			cont = cont+1			
+
+	print(cont)		
+	print(len(planilha))
+	# z = input("")		
+
+	planilha = planilha.reset_index()
+
+
+	# gerar a planilha já sem os sorteados anteriormente na variável planilha
+
 	tribunais = pd.DataFrame(planilha.groupby(["Tribunal"])["Tribunal"].count())
 	tribunais.columns = ["quantidade"]
 
@@ -3492,7 +3659,7 @@ def seleciona_amostra_quali():
 
 	manu = ['TJAC','TJAM','TJAP','TJBA']
 	vivi = ['TJGO','TJPE','TJPR','TJRO']
-	ana = ['TJRR','TJSE','TJTO','TRF5']		
+	ana = ['TJRR','TJSE','TJTO','TRF5']			
 
 
 
@@ -3502,7 +3669,10 @@ def seleciona_amostra_quali():
 	for k in range(len(selct)):
 		df_filter = planilha["Tribunal"] == selct[k]
 		planilha_1 = planilha[df_filter]
-		amostra_trib = planilha_1.sample(194)
+		try:
+			amostra_trib = planilha_1.sample(194)
+		except:
+			amostra_trib = planilha_1
 		if selct[k] in manu:
 			dfs_manu.append(amostra_trib)
 			# print(amostra_trib)
@@ -3540,35 +3710,134 @@ def seleciona_amostra_quali():
 
 	for z in range(len(dfs_manu)):
 		amostras = pd.concat([dfs_manu_rw[z],dfs_manu[z]])
-		amostras.to_excel("sorteio_0_amostra_"+str(z+1)+"_Manu.xlsx", index = False)
+		amostras.to_excel("sorteio_1_amostra_"+str(z+1)+"_Manu.xlsx", index = False)
 		print("Manu")
 		print(amostras)
 		# print(amostras.info())
 		print(amostras.Tribunal.value_counts())
 		print("\n ******"*5)
 		amostras = pd.concat([dfs_vivi_rw[z],dfs_vivi[z]])
-		amostras.to_excel("sorteio_0_amostra_"+str(z+1)+"_Vivi.xlsx", index = False)
+		amostras.to_excel("sorteio_1_amostra_"+str(z+1)+"_Vivi.xlsx", index = False)
 		print("Vivi")
 		# print(amostras)
 		print(amostras.info())
 		print(amostras.Tribunal.value_counts())
 		print("\n ******"*5)
 		amostras = pd.concat([dfs_ana_rw[z],dfs_ana[z]])
-		amostras.to_excel("sorteio_0_amostra_"+str(z+1)+"_Ana.xlsx", index = False)
+		amostras.to_excel("sorteio_1_amostra_"+str(z+1)+"_Ana.xlsx", index = False)
 		print("Ana")
 		# print(amostras)
 		print(amostras.info())
 		print(amostras.Tribunal.value_counts())
 		print("\n ******"*5)
 
-		a = input("")
+		# a = input("")
+
+
+#############################################################################################
 				
+def seleciona_amostra_quali_v_2():
+
+	#### faltou amostrar TRF3 - fazer com a próxima leva
+
+	planilha = pd.read_csv("Dados_unificados_JSON_LAI_SEEU_v2.csv",  dtype = 'object')
+
+	tribunais = pd.DataFrame(planilha.groupby(["Tribunal"])["Tribunal"].count())
+	tribunais.columns = ["quantidade"]
+
+	tribunais = tribunais.reset_index()
+	# print(tribunais)
+	# a= input("")
+
+
+	selct = []
+	for item in tribunais["Tribunal"]:
+		if re.search('MG|MA|DF|MS|MT|PA|PI|SP|TRF1',item):
+			selct.append(item)
+		else:
+			pass
+
+
+	manu = ['TJMG','TJMS','TJPI']
+	vivi = ['TJMA','TJMT','TJSP']
+	ana = ['TJDFT','TJPA','TRF1']		
 
 
 
+	dfs_manu = []
+	dfs_vivi = []
+	dfs_ana = []
+	for k in range(len(selct)):
+		df_filter = planilha["Tribunal"] == selct[k]
+		planilha_1 = planilha[df_filter]
+		amostra_trib = planilha_1.sample(194)
+		print(amostra_trib)
+		z= input("")
+		if selct[k] in manu:
+			dfs_manu.append(amostra_trib)
+			# print(amostra_trib)
+		elif selct[k] in vivi:
+			dfs_vivi.append(amostra_trib)
+			# print(amostra_trib)
+		elif selct[k] in ana:
+			dfs_ana.append(amostra_trib)
+			# print(amostra_trib)
+
+
+	print(len(dfs_ana))
+	print()
+	print()
+	print(len(dfs_manu))
+	print()
+	print()
+	print(len(dfs_vivi))		
+	a= input("")		
+
+
+	dfs_manu_rw = []
+	dfs_vivi_rw = []
+	dfs_ana_rw = []		
+
+	for n in range(len(dfs_manu)):
+		# Ana recebe Manu
+
+		amostra_trib = dfs_manu[n].sample(6)
+		dfs_ana_rw.append(amostra_trib)
+
+		## vivi recebe Ana
+
+		amostra_trib = dfs_ana[n].sample(6)
+		dfs_vivi_rw.append(amostra_trib)
+
+
+		# manu recebe Vivi
+		amostra_trib = dfs_vivi[n].sample(6)
+		dfs_manu_rw.append(amostra_trib)
 
 
 
+	for z in range(len(dfs_manu)):
+		amostras = pd.concat([dfs_manu_rw[z],dfs_manu[z]])
+		amostras.to_excel("sorteio_0_v2_amostra_"+str(z+1)+"_Manu.xlsx", index = False)
+		print("Manu")
+		print(amostras)
+		# print(amostras.info())
+		print(amostras.Tribunal.value_counts())
+		print("\n ******"*5)
+		amostras = pd.concat([dfs_vivi_rw[z],dfs_vivi[z]])
+		amostras.to_excel("sorteio_0_v2_amostra_"+str(z+1)+"_Vivi.xlsx", index = False)
+		print("Vivi")
+		# print(amostras)
+		print(amostras.info())
+		print(amostras.Tribunal.value_counts())
+		print("\n ******"*5)
+		amostras = pd.concat([dfs_ana_rw[z],dfs_ana[z]])
+		amostras.to_excel("sorteio_0_v2_amostra_"+str(z+1)+"_Ana.xlsx", index = False)
+		print("Ana")
+		# print(amostras)
+		print(amostras.info())
+		print(amostras.Tribunal.value_counts())
+		print("\n ******"*5)
 
 
 if __name__ == "__main__":
@@ -3601,4 +3870,5 @@ if __name__ == "__main__":
 	# dados_TRF5()
 	# main()
 	# seleciona_amostra()
-	seleciona_amostra_quali()
+	# seleciona_amostra_quali()
+	seleciona_amostra_quali_v_2()
